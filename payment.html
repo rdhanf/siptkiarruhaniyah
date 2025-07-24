@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informasi Pembayaran Siswa - MTS ATTAQWA 18 TANAH TINGGI</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="asset/img/attaqwa.png" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo-container">
+                <img src="asset/img/attaqwa.png" alt="Logo MTS ATTAQWA 18" class="logo">
+                <h1>MTS ATTAQWA 18 TANAH TINGGI</h1>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="#payment-info" class="active">Pembayaran</a></li> <li><a href="index.html#galeri">Galeri</a></li>
+                    <li><a href="index.html#rdm-info">RDM</a></li>
+                    <li><a href="index.html#sisfoma-info">Sisfoma</a></li>
+                    <li><a href="index.html#ppdb">PPDB</a></li>
+                    <li><a href="index.html#kontak">Kontak</a></li>
+                </ul>
+                <div class="burger-menu">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="payment-info" class="section-design1">
+            <div class="container">
+                <h2>Informasi Pembayaran Siswa</h2>
+                <div class="student-search-section">
+                    <input type="text" id="nisnInput" placeholder="Masukkan NISN siswa" aria-label="Masukkan NISN siswa">
+                    <button id="searchStudentBtn" class="btn-primary">Cari Siswa</button>
+                </div>
+
+                <div id="studentDetails" class="student-details" style="display: none;">
+                    <h3>Detail Pembayaran untuk <span id="studentName"></span> (NISN: <span id="studentNISN"></span>)</h3>
+                    <p>Kelas: <span id="studentClass"></span></p>
+                    <p>Nama Orang Tua: <span id="parentName"></span></p>
+
+                    <h4>Daftar Pembayaran</h4>
+                    <div class="payment-cards-container" id="paymentCardsContainer">
+                        </div>
+                </div>
+
+                <div id="noStudentFound" class="message-box" style="display: none;">
+                    <p>NISN tidak ditemukan. Mohon periksa kembali NISN yang Anda masukkan.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 MTS ATTAQWA 18 TANAH TINGGI. Hak Cipta Dilindungi.</p>
+            <p>Dibuat dengan ❤️ oleh Tim Pengembang Madrasah Hebat</p>
+        </div>
+    </footer>
+
+    <button id="scrollToTopBtn" title="Scroll to top" aria-label="Scroll to top of page">
+        <i class="fa-regular fa-circle-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+    <script src="payment-script.js"></script> </body>
+</html>

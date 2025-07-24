@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran Siswa TK Islam Arruhaniyah</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-branding">
+                <img src="img/ARRUHANIYAH 3.png" alt="Logo TK Islam Arruhaniyah" class="school-logo">
+                <div>
+                    <h1>TK Islam Arruhaniyah</h1>
+                    <p>Tahun Pelajaran 2025/2026</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Beranda</a></li>
+                    <li><a href="#payment-check">Cek Pembayaran</a></li>
+                    <li><a href="#payment-types">Jenis Pembayaran</a></li>
+                    <li><a href="#how-to-check">Cara Cek</a></li>
+                    <li><a href="#contact">Kontak Kami</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home" class="hero">
+            <h2>Selamat Datang, Orang Tua Hebat!</h2>
+            <p>Pantau status pembayaran putra/putri Anda dengan mudah dan transparan di sini.</p>
+            <a href="#payment-check" class="button">Cek Pembayaran Sekarang</a>
+        </section>
+
+        <section id="payment-check">
+            <h2>Cek Status Pembayaran Siswa</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Cari Nama Siswa atau NISN..." aria-label="Cari Nama Siswa atau NISN">
+                <input type="text" id="parentNameInput" placeholder="Masukkan Nama Ibu..." aria-label="Masukkan Nama Ibu">
+                <button id="searchButton" class="button">Cari Data</button>
+            </div>
+            
+            <div id="loadingMessage" class="message-box info" style="display: none;">
+                <p><i class="fas fa-spinner fa-spin"></i> Memuat data pembayaran, mohon tunggu...</p>
+            </div>
+            <div id="errorMessage" class="message-box error" style="display: none;">
+                <p><i class="fas fa-exclamation-triangle"></i> Gagal memuat data. Mohon cek koneksi internet atau URL publik Google Sheet Anda.</p>
+            </div>
+            <div id="studentDetails" class="student-details" style="display: none;">
+                <h3>Detail Pembayaran untuk <span id="studentName"></span> (NISN: <span id="studentNISN"></span>)</h3>
+                <p>Kelas: <span id="studentClass"></span></p>
+                <p>Nama Orang Tua: <span id="parentNameDetail"></span></p>
+                
+                <h4>Daftar Pembayaran</h4>
+                <div class="payment-cards-container" id="paymentCardsContainer">
+                    </div>
+
+                <div class="print-button-container">
+                    <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
+                    </div>
+            </div>
+
+            <p id="noResults" class="message-box" style="display:none;">Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
+            
+            <p class="status-info">
+                <span class="status-lunas">Lunas</span> | 
+                <span class="status-belum">Belum Lunas</span> | 
+                <span class="status-tertunda">Tertunda</span>
+            </p>
+        </section>
+
+        <section id="payment-types">
+            <h2>Jenis-Jenis Pembayaran</h2>
+            <ul>
+                <li>**PPDB (Penerimaan Peserta Didik Baru):** Uang pendaftaran, uang pangkal, seragam, dll.</li>
+                <li>**SPP (Sumbangan Pembinaan Pendidikan):** Iuran bulanan untuk operasional sekolah.</li>
+                <li>**Kegiatan-kegiatan:**
+                    <ul>
+                        <li>Porseni</li>
+                        <li>Manasik Haji</li>
+                        <li>Polisi Cinta Anak</li>
+                        <li>Transportasi Umum</li>
+                        <li>Raport</li>
+                        <li>Buku LKS</li>
+                        <li>Foto Wisuda</li>
+                        <li>Akhir Tahun</li>
+                        <li>P5 1</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>Setiap pembayaran penting untuk mendukung kegiatan belajar mengajar putra/putri Anda.</p>
+        </section>
+
+        <section id="how-to-check">
+            <h2>Cara Cek Pembayaran</h2>
+            <ol>
+                <li>Kunjungi halaman **"Cek Pembayaran"**.</li>
+                <li>Masukkan **Nama Siswa atau NISN** pada kolom pertama.</li>
+                <li>Masukkan **Nama Ibu** pada kolom kedua.</li>
+                <li>Klik tombol **"Cari Data"**.</li>
+                <li>Data siswa yang relevan akan muncul jika kombinasi nama cocok.</li>
+                <li>**Pilih pembayaran yang ingin dicetak** dengan mencentang kotak di sampingnya.</li>
+                <li>Klik tombol **"Cetak Slip Pembayaran Terpilih"**.</li>
+                <li>Perhatikan warna pada status pembayaran:
+                    <ul>
+                        <li>**Hijau:** Lunas</li>
+                        <li>**Merah:** Belum Lunas</li>
+                        <li>**Kuning:** Tertunda / Proses</li>
+                    </ul>
+                </li>
+                <li>Jika data tidak ditemukan, pastikan penulisan nama sudah benar dan sesuai data sekolah.</li>
+            </ol>
+            <p>Jika ada pertanyaan lebih lanjut, jangan ragu hubungi kontak kami.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <section id="contact">
+                <h2>Kontak Kami</h2>
+                <p>Silakan hubungi kami jika Anda memiliki pertanyaan atau membutuhkan bantuan.</p>
+                <p><strong>Alamat Sekolah:</strong> Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia</p>
+                <p><strong>WhatsApp (Pak Ridhan Fauzi):</strong> 083879667121</p>
+                <a href="https://wa.me/qr/DHHAD233DTTEN1" target="_blank" class="button whatsapp-button">Hubungi Via WhatsApp</a>
+            </section>
+            <p>&copy; 2025 TK Islam Arruhaniyah.<br> Semua Hak Dilindungi.</p>
+        </div>
+    </footer>
+    
+    <button id="scrollToTopBtn" title="Scroll to top" aria-label="Scroll to top of page">
+        <i class="fa-regular fa-circle-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
