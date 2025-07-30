@@ -615,7 +615,7 @@ footer #contact p {
 
 /* ... kode CSS yang sudah ada ... */
 
-/* Adjust payment-item-card to accommodate checkbox */
+/* Adjust payment-item-card to accommodate checkbox and nominal input */
 .payment-item-card {
     display: flex;
     justify-content: space-between;
@@ -629,12 +629,43 @@ footer #contact p {
     border-bottom: none;
 }
 
-.payment-item-card .payment-info { /* New wrapper for name and status */
+.payment-item-card .payment-info { /* Wrapper for name and status */
     display: flex;
     justify-content: space-between;
     flex-grow: 1; /* Allow info to take available space */
-    margin-right: 10px; /* Space between info and checkbox */
+    margin-right: 10px; /* Space between info and other elements */
 }
+
+.payment-item-card .nominal-input-container { /* New container for nominal input */
+    display: flex;
+    align-items: center;
+    margin-right: 10px; /* Space between nominal and checkbox */
+    white-space: nowrap; /* Prevent "Nominal:" from wrapping */
+}
+
+.payment-item-card .nominal-input-container label {
+    font-size: 0.9em;
+    margin-right: 5px;
+    font-weight: 500;
+}
+
+.payment-item-card input[type="number"] {
+    width: 80px; /* Adjust width as needed */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+    text-align: right;
+    -moz-appearance: textfield; /* Remove spinner buttons for Firefox */
+}
+
+/* Remove spinner buttons for Chrome, Safari, Edge */
+.payment-item-card input[type="number"]::-webkit-outer-spin-button,
+.payment-item-card input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 
 .payment-item-card input[type="checkbox"] {
     transform: scale(1.3); /* Make checkbox slightly larger */
@@ -642,9 +673,58 @@ footer #contact p {
     cursor: pointer;
 }
 
-/* Ensure checkbox is hidden in print media */
+.instruction-text {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Ensure checkbox and nominal input are hidden in print media */
 @media print {
-    .payment-item-card input[type="checkbox"] {
+    .payment-item-card input[type="checkbox"],
+    .payment-item-card input[type="number"],
+    .payment-item-card .nominal-input-container label,
+    .instruction-text {
         display: none !important;
     }
 }
+
+/* Print slip table cell for nominal */
+.payment-table .nominal-cell {
+    text-align: right;
+    width: 30%; /* Adjust width as needed */
+}
+/* style.css */
+
+/* ... kode CSS yang sudah ada ... */
+
+/* NEW: Style for Arrears Button */
+.arrears-button {
+    background-color: #ff9800; /* Orange color for arrears button */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex; /* Align icon and text */
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+    margin-left: 10px; /* Space from print button */
+}
+
+.arrears-button:hover {
+    background-color: #e68900; /* Darker orange on hover */
+}
+
+/* Ensure these buttons are hidden in print media */
+@media print {
+    /* ... existing print styles ... */
+    .print-button-container {
+        display: none !important; /* Hide the entire button container */
+    }
+}
+
+/* ... sisa kode CSS Anda ... */
