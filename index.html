@@ -57,12 +57,14 @@
                 <p>Nama Orang Tua: <span id="parentNameDetail"></span></p>
                 
                 <h4>Daftar Pembayaran</h4>
+                <p class="instruction-text">Centang pembayaran yang ingin dicetak dan masukkan nominal (jika ada).</p>
                 <div class="payment-cards-container" id="paymentCardsContainer">
                     </div>
 
                 <div class="print-button-container">
                     <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
-                    </div>
+                    <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan SPP</button>
+                </div>
             </div>
 
             <p id="noResults" class="message-box" style="display:none;">Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
@@ -82,7 +84,7 @@
                 <li>**Kegiatan-kegiatan:**
                     <ul>
                         <li>Porseni</li>
-                        <li>Manasik Haji</li>
+                        <li>Membatik</li>
                         <li>Polisi Cinta Anak</li>
                         <li>Transportasi Umum</li>
                         <li>Raport</li>
@@ -105,7 +107,9 @@
                 <li>Klik tombol **"Cari Data"**.</li>
                 <li>Data siswa yang relevan akan muncul jika kombinasi nama cocok.</li>
                 <li>**Pilih pembayaran yang ingin dicetak** dengan mencentang kotak di sampingnya.</li>
+                <li>**Masukkan nominal (angka saja)** pada kolom yang tersedia di samping status pembayaran.</li>
                 <li>Klik tombol **"Cetak Slip Pembayaran Terpilih"**.</li>
+                <li>Untuk **mencetak tagihan tunggakan SPP**, klik tombol "Cetak Tagihan Tunggakan SPP" setelah data siswa ditemukan.</li>
                 <li>Perhatikan warna pada status pembayaran:
                     <ul>
                         <li>**Hijau:** Lunas</li>
