@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi Utama ===
     // PASTIKAN URL INI BENAR SESUAI PUBLIKASI CSV DARI GOOGLE SHEET ANDA!
-    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; // URL Google Sheet Anda
+    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; // URL Google Sheet Anda yang baru
     const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; // Path ke logo sekolah Anda
     const schoolName = "TK Islam Arruhaniyah";
     const schoolAddress = "Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia";
@@ -11,9 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi SPP ===
     const SPP_NOMINAL_AMOUNT = 90000; // Nominal SPP setiap bulan
     const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya
-    // Urutan bulan SPP sesuai tahun ajaran (Juli - Juni)
     const SPP_MONTHS_ACADEMIC_ORDER = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
-
 
     // === Ambil Elemen DOM ===
     const searchInput = document.getElementById('searchInput');
@@ -29,12 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const printSlipButton = document.getElementById('printSlipButton');
     const printArrearsButton = document.getElementById('printArrearsButton'); 
     
-    // Pastikan tombol cetak awalnya disembunyikan di HTML dengan style="display: none;"
     printSlipButton.style.display = 'none'; 
     printArrearsButton.style.display = 'none'; 
 
     let allPaymentData = [];
-    let currentStudentData = null; // Untuk menyimpan data siswa yang sedang ditampilkan
+    let currentStudentData = null; 
 
     // List of payment columns in the order you want them on the slip
     // Pastikan nama kolom ini SAMA PERSIS dengan header di Google Sheet Anda
@@ -144,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Helper function to get 0-indexed calendar month from month name
-    // (Jan=0, Feb=1, ..., Dec=11)
     function getCalendarMonthIndex(monthName) {
         const monthMap = {
             'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
@@ -389,8 +385,8 @@ document.addEventListener('DOMContentLoaded', function() {
         printWindow.print(); 
     }
 
-    // === Fungsi untuk Membuat dan Mencetak Slip Tagihan Tunggakan SPP ===
-    function generateSppArrearsSlip(studentData) {
+    // === NEW: Fungsi untuk Membuat dan Mencetak Slip Tagihan Tunggakan Gabungan ===
+    function generateCombinedArrearsSlip(studentData) {
         if (!studentData) {
             alert('Tidak ada data siswa untuk membuat tagihan tunggakan.');
             return;
@@ -398,78 +394,84 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const currentMonthCalendarIndex = currentDate.getMonth(); // 0-11 (Jan=0, Feb=1, ..., Juli=6)
+        const currentMonthCalendarIndex = currentDate.getMonth(); 
         const currentDay = currentDate.getDate();
 
-        let overdueSppItems = [];
+        let arrearsItems = [];
         let totalArrearsNominal = 0;
 
         // Indeks kalender untuk bulan Juli (sebagai awal tahun ajaran)
         const ACADEMIC_YEAR_START_MONTH_CAL_INDEX = getCalendarMonthIndex('Juli'); 
         
-        // Iterasi melalui bulan-bulan SPP sesuai urutan tahun ajaran
-        SPP_MONTHS_ACADEMIC_ORDER.forEach(monthName => {
-            const colName = `Status_SPP_${monthName}`; 
+        // Iterasi melalui semua kolom pembayaran
+        paymentColumns.forEach(colName => {
             const status = studentData[colName];
 
-            // Hanya proses jika statusnya 'belum lunas'
-            if (status && status.toLowerCase().trim() === 'belum lunas') {
-                const sppCalendarMonthIndex = getCalendarMonthIndex(monthName);
+            // Cek apakah statusnya BELUM LUNAS atau TERTUNDA
+            if (status && (status.toLowerCase().trim() === 'belum lunas' || status.toLowerCase().trim() === 'tertunda')) {
                 
-                let isOverdue = false;
-
-                // Konversi indeks bulan kalender ke indeks urutan tahun ajaran
-                // Contoh: Juli (kalender 6) menjadi indeks 0 tahun ajaran
-                // Januari (kalender 0) menjadi indeks 6 tahun ajaran
-                let sppAcademicOrderIndex;
-                if (sppCalendarMonthIndex >= ACADEMIC_YEAR_START_MONTH_CAL_INDEX) {
-                    sppAcademicOrderIndex = sppCalendarMonthIndex - ACADEMIC_YEAR_START_MONTH_CAL_INDEX;
-                } else {
-                    sppAcademicOrderIndex = sppCalendarMonthIndex + (12 - ACADEMIC_YEAR_START_MONTH_CAL_INDEX);
+                // Ambil nominal dari input di UI jika ada, jika tidak, gunakan nilai default SPP
+                const nominalInput = document.getElementById(`nominal-${colName}`);
+                let nominalValue = 0;
+                if (nominalInput) {
+                    nominalValue = parseInt(nominalInput.value) || 0;
+                } else if (colName.startsWith('Status_SPP_')) {
+                    nominalValue = SPP_NOMINAL_AMOUNT;
                 }
-
-                let currentAcademicOrderIndex;
-                if (currentMonthCalendarIndex >= ACADEMIC_YEAR_START_MONTH_CAL_INDEX) {
-                    currentAcademicOrderIndex = currentMonthCalendarIndex - ACADEMIC_YEAR_START_MONTH_CAL_INDEX;
-                } else {
-                    currentAcademicOrderIndex = currentMonthCalendarIndex + (12 - ACADEMIC_YEAR_START_MONTH_CAL_INDEX);
-                }
-
-                // Logika penentuan apakah sudah jatuh tempo
-                // 1. Bulan SPP secara urutan tahun ajaran lebih dulu dari bulan sekarang
-                if (sppAcademicOrderIndex < currentAcademicOrderIndex) {
-                    isOverdue = true;
-                } 
-                // 2. Bulan SPP sama dengan bulan sekarang DAN sudah melewati tanggal jatuh tempo
-                else if (sppAcademicOrderIndex === currentAcademicOrderIndex) {
-                    if (currentDay > SPP_DUE_DAY) {
-                        isOverdue = true;
+                
+                let displayColName = colName;
+                if (colName.startsWith('Status_SPP_')) {
+                    const monthName = colName.replace('Status_SPP_', '');
+                    const sppCalendarMonthIndex = getCalendarMonthIndex(monthName);
+                    
+                    let sppAcademicOrderIndex;
+                    if (sppCalendarMonthIndex >= ACADEMIC_YEAR_START_MONTH_CAL_INDEX) {
+                        sppAcademicOrderIndex = sppCalendarMonthIndex - ACADEMIC_YEAR_START_MONTH_CAL_INDEX;
+                    } else {
+                        sppAcademicOrderIndex = sppCalendarMonthIndex + (12 - ACADEMIC_YEAR_START_MONTH_CAL_INDEX);
                     }
-                }
-                // Catatan: Asumsi semua kolom SPP di spreadsheet adalah untuk tahun ajaran yang sedang berjalan
-                // atau yang terakhir. Penanganan tahun yang spesifik (misal SPP Juli 2024 vs Juli 2025)
-                // memerlukan data tahun di spreadsheet.
 
-                if (isOverdue) {
-                    overdueSppItems.push({
-                        month: monthName,
-                        nominal: SPP_NOMINAL_AMOUNT
+                    let currentAcademicOrderIndex;
+                    if (currentMonthCalendarIndex >= ACADEMIC_YEAR_START_MONTH_CAL_INDEX) {
+                        currentAcademicOrderIndex = currentMonthCalendarIndex - ACADEMIC_YEAR_START_MONTH_CAL_INDEX;
+                    } else {
+                        currentAcademicOrderIndex = currentMonthCalendarIndex + (12 - ACADEMIC_YEAR_START_MONTH_CAL_INDEX);
+                    }
+                    
+                    // Cek apakah sudah melewati tanggal jatuh tempo
+                    if (sppAcademicOrderIndex < currentAcademicOrderIndex || 
+                        (sppAcademicOrderIndex === currentAcademicOrderIndex && currentDay > SPP_DUE_DAY)) {
+                        
+                        displayColName = `SPP ${monthName}`;
+                        arrearsItems.push({
+                            name: displayColName,
+                            nominal: nominalValue
+                        });
+                        totalArrearsNominal += nominalValue;
+                    }
+
+                } else {
+                    // Untuk pembayaran non-SPP, langsung masukkan ke daftar tunggakan
+                    displayColName = colName.replace(/_/g, ' '); 
+                    arrearsItems.push({
+                        name: displayColName,
+                        nominal: nominalValue
                     });
-                    totalArrearsNominal += SPP_NOMINAL_AMOUNT;
+                    totalArrearsNominal += nominalValue;
                 }
             }
         });
 
-        if (overdueSppItems.length === 0) {
-            alert('Tidak ada tunggakan SPP yang ditemukan untuk siswa ini.');
+        if (arrearsItems.length === 0) {
+            alert('Tidak ada tunggakan pembayaran yang ditemukan untuk siswa ini.');
             return;
         }
 
         let arrearsItemsHtml = '';
-        overdueSppItems.forEach(item => {
+        arrearsItems.forEach(item => {
             arrearsItemsHtml += `
                 <tr>
-                    <td>SPP ${item.month}</td>
+                    <td>${item.name}</td>
                     <td class="nominal-cell">${formatRupiah(item.nominal)}</td>
                 </tr>
             `;
@@ -478,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const printContent = `
             <html>
             <head>
-                <title>Tagihan Tunggakan SPP - ${studentData['Nama Siswa']}</title>
+                <title>Tagihan Pembayaran - ${studentData['Nama Siswa']}</title>
                 <style>
                     body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; color: #333; }
                     .slip-container { 
@@ -529,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p>Telp/WA: ${contactNumber}</p>
                     </div>
 
-                    <div class="section-title">TAGIHAN TUNGGAKAN PEMBAYARAN SPP</div>
+                    <div class="section-title">TAGIHAN TUNGGAKAN PEMBAYARAN</div>
                     <div class="info-row">
                         <span>Tanggal Cetak:</span> <span>${currentDate.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}</span>
                     </div>
@@ -550,20 +552,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     <table class="payment-table">
                         <thead>
                             <tr>
-                                <th>Bulan SPP</th>
+                                <th>Jenis Pembayaran</th>
                                 <th>Nominal</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${arrearsItemsHtml}
                             <tr class="total-row">
-                                <td colspan="2">TOTAL TUNGGAKAN</td>
+                                <td>TOTAL TUNGGAKAN</td>
                                 <td class="nominal-cell">${formatRupiah(totalArrearsNominal)}</td>
                             </tr>
                         </tbody>
                     </table>
                     
-                    <p class="important-note">Mohon segera melunasi tunggakan pembayaran SPP.</p>
+                    <p class="important-note">Mohon segera melunasi tunggakan pembayaran.</p>
 
                     <div class="signature">
                         <p>Bekasi, ${currentDate.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}</p>
@@ -587,7 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
         printWindow.focus(); 
         printWindow.print(); 
     }
-
+    
     // === Event Listeners ===
     searchButton.addEventListener('click', performSearch);
     
@@ -625,12 +627,13 @@ document.addEventListener('DOMContentLoaded', function() {
         generatePrintSlip(currentStudentData, selectedPayments); 
     });
 
+    // Panggil fungsi yang baru
     printArrearsButton.addEventListener('click', function() {
         if (!currentStudentData) {
             alert('Tidak ada data siswa yang ditemukan. Mohon lakukan pencarian terlebih dahulu.');
             return;
         }
-        generateSppArrearsSlip(currentStudentData);
+        generateCombinedArrearsSlip(currentStudentData);
     });
 
     searchInput.addEventListener('keypress', function(event) {
