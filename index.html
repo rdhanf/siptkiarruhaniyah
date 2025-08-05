@@ -61,9 +61,20 @@
                 <div class="payment-cards-container" id="paymentCardsContainer">
                     </div>
 
+                <div class="manual-payment-container">
+                    <h4><i class="fas fa-plus-circle"></i> Tambah Pembayaran Manual untuk Tagihan</h4>
+                    <div class="manual-input-row">
+                        <input type="text" id="manualPaymentName" placeholder="Nama Pembayaran (cth: Uang Buku)" aria-label="Nama Pembayaran Manual">
+                        <input type="number" id="manualPaymentNominal" placeholder="Nominal (cth: 150000)" aria-label="Nominal Pembayaran Manual" min="0">
+                        <button id="addManualPaymentBtn" class="button"><i class="fas fa-plus"></i> Tambah</button>
+                    </div>
+                    <ul id="manualPaymentList">
+                        </ul>
+                </div>
+                
                 <div class="print-button-container">
                     <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
-                    <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan SPP</button>
+                    <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan</button>
                 </div>
             </div>
 
@@ -109,7 +120,7 @@
                 <li>**Pilih pembayaran yang ingin dicetak** dengan mencentang kotak di sampingnya.</li>
                 <li>**Masukkan nominal (angka saja)** pada kolom yang tersedia di samping status pembayaran.</li>
                 <li>Klik tombol **"Cetak Slip Pembayaran Terpilih"**.</li>
-                <li>Untuk **mencetak tagihan tunggakan SPP**, klik tombol "Cetak Tagihan Tunggakan SPP" setelah data siswa ditemukan.</li>
+                <li>Untuk **mencetak tagihan tunggakan**, klik tombol "Cetak Tagihan Tunggakan". Anda juga bisa **menambahkan item tagihan lain secara manual** di bawah daftar pembayaran.</li>
                 <li>Perhatikan warna pada status pembayaran:
                     <ul>
                         <li>**Hijau:** Lunas</li>
@@ -129,7 +140,7 @@
                 <h2>Kontak Kami</h2>
                 <p>Silakan hubungi kami jika Anda memiliki pertanyaan atau membutuhkan bantuan.</p>
                 <p><strong>Alamat Sekolah:</strong> Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia</p>
-                <p><strong>WhatsApp (Pak Ridhan Fauzi):</strong> 083879667121</p>
+                <p><strong>WhatsApp (Pak Ridhan Fauzi):</strong> 087783049121</p>
                 <a href="https://wa.me/qr/DHHAD233DTTEN1" target="_blank" class="button whatsapp-button">Hubungi Via WhatsApp</a>
             </section>
             <p>&copy; 2025 TK Islam Arruhaniyah.<br> Semua Hak Dilindungi.</p>
