@@ -1,29 +1,31 @@
+/* style.css */
+
+/* === Variable Color Palette === */
 :root {
-    --primary-color: #7EC8A8; /* Hijau muda */
-    --secondary-color: #ADD8E6; /* Biru muda */
-    --accent-color: #FFD700; /* Kuning cerah */
+    --primary-color: #4A90E2; /* Biru langit */
+    --secondary-color: #6AC2D0; /* Biru toska */
+    --accent-color: #F8D04B; /* Kuning mustard */
     --text-color: #333;
-    --background-light: #F8F8F8;
-    --background-white: #FFFFFF;
-    --border-color: #ddd;
+    --text-light-color: #777;
+    --background-color: #F0F2F5; /* Abu-abu muda */
+    --card-background: #FFFFFF;
+    --border-color: #E0E0E0;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 6px 18px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
 
-    --status-lunas: #4CAF50; /* Hijau untuk lunas */
-    --status-belum: #F44336; /* Merah untuk belum lunas */
-    --status-tertunda: #FFC107; /* Kuning untuk tertunda */
-
-    /* Tambahan untuk konsistensi */
-    --heading-color: #333;
-    --primary-dark-color: #6aaa90; /* Sedikit lebih gelap dari primary */
-    --shadow-small: 0 2px 5px rgba(0,0,0,0.08);
-    --shadow-medium: 0 4px 10px rgba(0,0,0,0.1);
-    --border-radius: 8px; /* Contoh border radius default */
+    /* Status Colors */
+    --status-lunas: #28A745; /* Hijau */
+    --status-belum: #DC3545; /* Merah */
+    --status-tertunda: #FFC107; /* Kuning */
 }
 
+/* === General Styles === */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--background-light);
+    background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
 }
@@ -34,49 +36,100 @@ body {
     padding: 20px;
 }
 
+h1, h2, h3, h4 {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+.whatsapp-button {
+    background-color: #25D366;
+}
+
+.whatsapp-button:hover {
+    background-color: #1DA851;
+}
+
+/* === Header & Navigation === */
 header {
-    background: linear-gradient(90deg, #cfecd0, #a0cea7, #9ec0db);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 20px 0;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-light);
 }
 
 .header-branding {
     display: flex;
-    align-items: center; /* Vertically align items */
-    justify-content: center; /* Centering for desktop, adjust if needed */
-    gap: 15px; /* Space between logo and text */
-    margin-bottom: 10px; /* Space below branding before navigation */
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+    color: white;
 }
 
 .school-logo {
-    height: 80px; /* Adjust height as needed */
+    height: 80px;
     width: auto;
-    border-radius: 50%; /* If you want a circular logo */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: subtle shadow */
+    border-radius: 50%;
+    box-shadow: var(--shadow-light);
 }
 
 .header-branding h1 {
-    margin: 0; /* Remove default margin from h1 */
-    font-size: 2.2em; /* Adjust font size as needed */
-    color: var(--text-color); /* Ubah warna jika latar belakang gradien terlalu cerah untuk putih */
+    margin: 0;
+    font-size: 2.2em;
+    color: white;
 }
 
 .header-branding p {
-    margin: 0; /* Remove default margin from p */
-    font-size: 1.1em; /* Adjust font size as needed */
-    color: #555; /* Ubah warna agar kontras dengan latar */
+    margin: 0;
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, 0.8);
 }
 
-/* Adjust navigation to be below branding */
 header nav ul {
-    margin-top: 10px;
     list-style: none;
     padding: 0;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 10px;
 }
 
 header nav ul li {
@@ -84,110 +137,65 @@ header nav ul li {
 }
 
 header nav ul li a {
-    color: var(--text-color); /* Ubah warna agar kontras */
-    text-decoration: none;
+    color: white;
     font-weight: 600;
-    padding: 5px 10px;
-    transition: background-color 0.3s ease;
-    border-radius: 5px;
+    padding: 8px 15px;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 header nav ul li a:hover,
 header nav ul li a.active {
-    background-color: rgba(0, 0, 0, 0.1); /* Sedikit gelap saat hover/active */
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
-
+/* === Main Content Sections === */
 main section {
-    background-color: var(--background-white);
+    background-color: var(--card-background);
     padding: 40px;
     margin-bottom: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
 }
 
 .hero {
     text-align: center;
-    background: linear-gradient(90deg, #cfecd0, #ffc5ca);
-    color: rgb(41, 40, 40);
-    padding: 60px 20px;
-    border-radius: 8px;
-    position: relative;
-    overflow: hidden; /* For potential background patterns */
+    background: linear-gradient(45deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    color: white;
+    padding: 80px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
 }
 
 .hero h2 {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 2.5em;
+    font-size: 2.8em;
     margin-bottom: 15px;
+    color: white;
 }
 
 .hero p {
-    font-size: 1.1em;
-    margin-bottom: 30px;
+    font-size: 1.2em;
+    margin-bottom: 40px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
-.button {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 12px 25px;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.button:hover {
-    background-color: var(--primary-dark-color); /* Slightly darker primary */
-}
-
-.whatsapp-button {
-    background-color: #25D366; /* WhatsApp green */
-}
-
-.whatsapp-button:hover {
-    background-color: #1DA851;
-}
-/* style.css */
-.message-box {
-    padding: 15px;
-    margin-top: 20px;
-    border-radius: 8px;
-    font-size: 1em;
-    text-align: center;
-}
-
-.message-box.info {
-    background-color: #e0f7fa; /* Light blue */
-    color: #00796b;
-    border: 1px solid #00bcd4;
-}
-
-.message-box.error {
-    background-color: #ffe0b2; /* Light orange */
-    color: #e65100;
-    border: 1px solid #ff9800;
-}
-/* Search Bar (sesuai HTML Anda) */
+/* === Search & Results === */
 .search-container {
-    margin-bottom: 20px;
-    text-align: center;
-    display: flex; /* Menggunakan flexbox untuk penataan sejajar */
-    flex-wrap: wrap; /* Agar bisa wrap ke baris baru di mobile */
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 10px; /* Jarak antar elemen */
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
 #searchInput,
 #parentNameInput {
-    flex: 1; /* Agar input bisa memanjang */
-    max-width: 300px; /* Batasi lebar maksimum */
-    padding: 12px 15px;
+    flex: 1;
+    max-width: 350px;
+    padding: 14px 20px;
     border: 1px solid var(--border-color);
-    border-radius: 25px;
+    border-radius: 50px;
     font-size: 1em;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -196,171 +204,351 @@ main section {
 #searchInput:focus,
 #parentNameInput:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 8px rgba(126, 200, 168, 0.3);
-}
-
-#searchButton {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#searchButton:hover {
-    background-color: var(--primary-dark-color); /* Slightly darker primary */
-}
-
-/* --- Detail Pembayaran Siswa (NEW CSS for functionality) --- */
-/* Menggunakan #payment-check sebagai container utama */
-#payment-check {
-    padding-top: 40px; /* Sesuaikan padding agar tidak terlalu mepet */
-    padding-bottom: 40px;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
 }
 
 .student-details {
-    background-color: white;
+    background-color: var(--card-background);
     padding: 30px;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-medium);
     margin-top: 30px;
-    margin-bottom: 30px; /* Tambahkan margin bawah */
 }
 
 .student-details h3, .student-details h4 {
-    color: var(--heading-color);
-    margin-bottom: 15px;
     border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.4em;
 }
 
 .student-details p {
-    font-size: 1.1em;
+    font-size: 1em;
     margin-bottom: 8px;
+    color: var(--text-light-color);
 }
 
-/* Style for individual payment items in the display section */
+.payment-cards-container {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .payment-item-card {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dotted var(--border-color); /* Use var for consistency */
-    font-size: 1em;
+    padding: 15px 20px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
 }
 
-.payment-item-card:last-child {
-    border-bottom: none;
+.payment-item-card:hover {
+    background-color: #E8EBF0;
+}
+
+.payment-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
 }
 
 .payment-name {
     font-weight: 500;
-    color: #555;
+    color: var(--text-color);
+    flex-grow: 1;
 }
 
 .payment-status {
-    font-weight: bold;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.9em;
 }
-
-
-/* Old .payment-cards-container and .payment-card are replaced by .payment-item-card for simpler display */
-.payment-cards-container {
-    /* grid display is no longer used for individual payment items as they are now simple flex items */
-    /* but we keep the container to group them */
-    display: block; /* Change from grid to block for list-like display */
-    margin-top: 25px;
-}
-
-/* Remove old .payment-card specific styles if they are no longer used for individual items */
-/* If you still have .payment-card being generated by JS, ensure it aligns with .payment-item-card */
-.payment-card { /* Keeping this just in case it's still being used somewhere, but it's likely replaced */
-    background-color: #f9f9f9;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 20px;
-    box-shadow: var(--shadow-small);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.payment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.payment-card h5 {
-    color: var(--text-color);
-    font-size: 1.2em;
-    margin-bottom: 10px;
-    border-bottom: 1px dashed var(--border-color);
-    padding-bottom: 8px;
-}
-
-.payment-card p {
-    margin-bottom: 5px;
-    font-size: 1em;
-    line-height: 1.5;
-}
-
 
 .status-lunas {
     color: var(--status-lunas);
-    font-weight: bold;
+    background-color: rgba(40, 167, 69, 0.1);
 }
 
-.status-belum { /* Renamed from belum-lunas to match JS getStatusClass */
+.status-belum {
     color: var(--status-belum);
-    font-weight: bold;
+    background-color: rgba(220, 53, 69, 0.1);
 }
 
 .status-tertunda {
     color: var(--status-tertunda);
-    font-weight: bold;
+    background-color: rgba(255, 193, 7, 0.1);
 }
 
-.payment-date {
-    font-style: italic;
-    font-size: 0.9em;
-    color: #666;
-    margin-left: 5px; /* Sedikit jarak dari status */
+.nominal-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
 }
 
-/* Menggunakan .message-box untuk #noResults */
-.message-box {
-    background-color: #ffeeba;
-    border: 1px solid #ffc107;
-    color: #856404;
-    padding: 20px;
-    border-radius: var(--border-radius);
+.nominal-input-container label {
+    font-weight: 500;
+    color: var(--text-light-color);
+}
+
+.nominal-input {
+    width: 100px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    text-align: right;
+}
+
+.payment-checkbox {
+    margin-left: 15px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+
+/* === Manual Payment Input === */
+.manual-payment-container {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.manual-payment-container h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary-color);
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+.manual-input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.manual-input-row input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+#addManualPaymentBtn {
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 8px;
+    padding: 0 15px;
+    font-size: 1.2em;
+}
+
+#addManualPaymentBtn:hover {
+    background-color: #5BA2AF;
+}
+
+#manualPaymentList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--border-color);
+}
+
+#manualPaymentList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1em;
+}
+
+#manualPaymentList li:last-child {
+    border-bottom: none;
+}
+
+.remove-manual-btn {
+    background: none;
+    border: none;
+    color: var(--status-belum);
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: color 0.2s ease;
+}
+
+.remove-manual-btn:hover {
+    color: #A03240;
+}
+
+
+/* === Print Buttons === */
+.print-button-container {
     text-align: center;
-    margin-top: 20px; /* Sesuaikan margin */
-    margin-bottom: 20px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border-color);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.print-button {
+    background-color: var(--primary-color);
+}
+
+.print-button:hover {
+    background-color: #3B7DCB;
+}
+
+.arrears-button {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+.arrears-button:hover {
+    background-color: #E2B83A;
 }
 
 .status-info {
     text-align: center;
-    margin-top: 20px; /* Sesuaikan margin */
+    margin-top: 20px;
     font-size: 0.9em;
-    color: #666;
+    color: var(--text-light-color);
 }
 
 .status-info span {
     display: inline-block;
-    margin: 0 5px;
+    margin: 0 10px;
+    font-weight: 600;
 }
 
-/* Footer */
+/* === Messages === */
+.message-box {
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    text-align: center;
+    font-weight: 500;
+    box-shadow: var(--shadow-light);
+}
+
+.message-box.info {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    border: 1px solid #90CAF9;
+}
+
+.message-box.error {
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #EF9A9A;
+}
+
+/* === NEW: Payment Info Section Styles === */
+#payment-info {
+    padding: 60px 0;
+}
+
+#payment-info h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 40px;
+    color: var(--primary-color);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.info-card {
+    background-color: var(--card-background);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border-left: 5px solid var(--primary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.info-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5em;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.info-card h3 i {
+    font-size: 1.2em;
+}
+
+.info-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-card li {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    color: var(--text-color);
+    display: flex;
+    align-items: flex-start;
+}
+
+.info-card li:before {
+    content: "•";
+    color: var(--primary-color);
+    font-size: 1.5em;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.payment-method {
+    display: flex;
+    flex-direction: column;
+}
+
+.method-name {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+.method-details {
+    font-size: 0.9em;
+    color: var(--text-light-color);
+    line-height: 1.4;
+}
+
+/* === Footer === */
 footer {
-    background-color: var(--text-color);
+    background-color: #2C3E50;
     color: white;
     text-align: center;
-    padding: 30px 0;
+    padding: 40px 0;
     font-size: 0.9em;
-    margin-top: 30px;
 }
 
 footer #contact {
@@ -378,332 +566,140 @@ footer #contact h2 {
 
 footer #contact p {
     margin-bottom: 5px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
-/* Scroll to Top Button */
+/* === Scroll to Top Button === */
 #scrollToTopBtn {
-    display: none; /* Hidden by default */
-    position: fixed; /* Fixed/sticky position */
-    bottom: 30px; /* Place the button at the bottom of the page */
-    right: 30px; /* Place the button 30px from the right */
-    z-index: 99; /* Make sure it does not overlap */
-    border: none; /* Remove borders */
-    outline: none; /* Remove outline */
-    background-color: var(--primary-color); /* Set a background color */
-    color: white; /* Text color */
-    cursor: pointer; /* Add a mouse pointer on hover */
-    padding: 15px; /* Some padding */
-    border-radius: 50%; /* Rounded corners */
-    font-size: 20px; /* Increase font size */
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5em;
     box-shadow: var(--shadow-medium);
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 #scrollToTopBtn:hover {
-    background-color: var(--primary-dark-color); /* Darker on hover */
-    transform: translateY(-3px);
+    background-color: var(--secondary-color);
+    transform: scale(1.1);
 }
 
-/* --- NEW: Style for the Print Button --- */
-.print-button-container {
-    text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px dashed var(--border-color); /* Use var for consistency */
-}
-
-.print-button {
-    background-color: #007bff; /* Blue color for print button */
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: inline-flex; /* Align icon and text */
-    align-items: center;
-    gap: 8px; /* Space between icon and text */
-}
-
-.print-button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-}
-
-
-/* --- NEW: PRINT-SPECIFIC STYLES (@media print) --- */
-/* These styles will only apply when the page is being printed */
-@media print {
-    /* Hide elements not needed for print */
-    body > *:not(.slip-container) { /* Hide everything EXCEPT the slip container in the new window */
-        display: none !important;
-    }
-
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden; /* Prevent scrollbars in print preview */
-    }
-
-    .slip-container {
-        width: 100%;
-        max-width: 80mm; /* Adjust for thermal printer width, e.g., 80mm */
-        margin: 0 auto;
-        padding: 10px;
-        border: none; /* Remove border for print */
-        box-shadow: none; /* Remove shadow for print */
-        font-size: 10pt; /* Adjust base font size for print */
-    }
-
-    .header-slip {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    .header-slip img {
-        max-width: 50px; /* Smaller logo for print */
-        height: auto;
-    }
-    .header-slip h2 {
-        margin: 5px 0;
-        font-size: 1em; /* Smaller font for school name */
-        color: #333;
-    }
-    .header-slip p {
-        margin: 2px 0;
-        font-size: 0.7em; /* Smaller font for address/contact */
-        color: #666;
-    }
-
-    .section-title {
-        font-weight: bold;
-        margin-top: 10px;
-        margin-bottom: 5px;
-        font-size: 0.8em;
-        border-bottom: 1px dashed #ccc;
-        padding-bottom: 3px;
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 3px;
-        font-size: 0.8em;
-    }
-    .info-row span:first-child {
-        font-weight: 500;
-    }
-
-    .payment-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 5px;
-        font-size: 0.8em;
-    }
-    .payment-table th, .payment-table td {
-        border: 1px solid #ddd;
-        padding: 5px;
-        text-align: left;
-    }
-    .payment-table th {
-        background-color: #f5f5f5;
-        font-weight: 600;
-    }
-
-    .status-cell {
-        text-align: center;
-        font-weight: bold;
-    }
-    /* Ensure colors print correctly */
-    .status-lunas { color: #4CAF50 !important; -webkit-print-color-adjust: exact; }
-    .status-belum { color: #F44336 !important; -webkit-print-color-adjust: exact; }
-    .status-tertunda { color: #FFC107 !important; -webkit-print-color-adjust: exact; }
-
-    .signature {
-        margin-top: 20px;
-        text-align: right;
-        font-size: 0.8em;
-    }
-    .signature p { margin: 3px 0; }
-    .signature .admin-name {
-        margin-top: 30px; /* Space for signature line */
-        border-top: 1px solid #333;
-        display: inline-block;
-        padding-top: 5px;
-    }
-
-    .footer-slip {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 0.7em;
-        color: #888;
-    }
-}
-
-
-/* Responsive Design */
+/* === Responsive Design === */
 @media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
     .header-branding {
-        flex-direction: column; /* Logo dan teks menjadi vertikal di mobile */
+        flex-direction: column;
         text-align: center;
-        gap: 5px; /* Kurangi jarak antar elemen */
+        gap: 5px;
     }
-
     .school-logo {
-        max-height: 70px; /* Kecilkan sedikit tinggi logo di mobile */
-        margin-bottom: 5px; /* Tambahkan sedikit jarak di bawah logo */
+        height: 60px;
     }
-
     .header-branding h1 {
-        font-size: 1.8em; /* Kecilkan ukuran font judul di mobile */
+        font-size: 1.8em;
     }
-
     .header-branding p {
-        font-size: 0.9em; /* Kecilkan ukuran font paragraf di mobile */
+        font-size: 0.9em;
     }
-
     header nav ul {
         flex-direction: column;
         align-items: center;
+        margin-top: 15px;
     }
     header nav ul li {
-        margin: 10px 0;
+        margin: 5px 0;
+    }
+    .hero {
+        padding: 60px 15px;
     }
     .hero h2 {
         font-size: 2em;
     }
+    .hero p {
+        font-size: 1em;
+    }
     .search-container {
-        flex-direction: column; /* Ubah ke kolom di layar kecil */
-        align-items: center;
+        flex-direction: column;
+        gap: 10px;
     }
     #searchInput,
     #parentNameInput,
     #searchButton {
-        width: 90%; /* Buat lebih lebar di mobile */
-        max-width: 400px; /* Batasi agar tidak terlalu lebar */
+        width: 100%;
+        max-width: none;
     }
     main section {
         padding: 20px;
     }
-
-    /* Penyesuaian untuk kartu pembayaran SPP di tampilan hasil pencarian */
-    .payment-card {
-        padding: 15px; /* Kurangi padding kartu */
-    }
-    .payment-card h5 {
-        font-size: 1.1em; /* Sedikit kecilkan judul */
-    }
-    .payment-card p {
-        font-size: 0.9em; /* Sedikit kecilkan paragraf */
-    }
-
-}
-
-@media (max-width: 480px) {
-    header h1 {
-        font-size: 1.5em;
-    }
-    .hero h2 {
-        font-size: 1.5em;
-    }
-    .hero p {
-        font-size: 0.9em;
-    }
-    .button {
-        padding: 10px 20px;
-        font-size: 0.9em;
-    }
-    /* Kecilkan ukuran font untuk kartu pembayaran di layar sangat kecil */
-    .payment-card h5 {
-        font-size: 1em; /* Lebih kecil lagi untuk judul kartu */
-    }
-    .payment-card p {
-        font-size: 0.85em; /* Lebih kecil lagi untuk paragraf kartu */
-    }
-
-    /* --- Perbaikan untuk Daftar Pembayaran (bagian cetak) di HP --- */
     .payment-item-card {
-        flex-direction: column; /* Tumpuk item dalam kartu pembayaran cetak */
-        align-items: flex-start; /* Rata kiri */
-        padding: 10px; /* Sesuaikan padding */
-        margin-bottom: 10px; /* Tambah jarak antar item */
-        border: 1px solid var(--border-color); /* Tambahkan border agar lebih jelas */
-        border-radius: var(--border-radius);
-    }
-
-    .payment-item-card .payment-info {
-        flex-direction: column; /* Tumpuk nama dan status */
+        flex-direction: column;
         align-items: flex-start;
-        width: 100%; /* Ambil lebar penuh */
-        margin-right: 0;
-        margin-bottom: 5px; /* Jarak antara info dan nominal */
-    }
-
-    .payment-item-card .nominal-input-container {
-        width: 100%; /* Ambil lebar penuh */
-        justify-content: space-between; /* Nominal dan checkbox terpisah di ujung */
-        margin-right: 0;
-    }
-
-    .payment-item-card input[type="number"] {
-        width: calc(100% - 70px); /* Kurangi lebar untuk label "Nominal" dan spasi */
-        max-width: 120px; /* Batasi lebar input nominal */
-    }
-
-    .payment-item-card input[type="checkbox"] {
-        margin-left: 0; /* Hapus margin kiri default */
-    }
-
-    .instruction-text {
-        padding: 0 10px; /* Tambahkan padding agar teks tidak terlalu mepet tepi */
-        font-size: 0.85em; /* Kecilkan ukuran font */
-    }
-
-    /* Tombol Cetak */
-    .print-button-container {
-        flex-direction: column; /* Tumpuk tombol cetak */
-        gap: 10px; /* Jarak antar tombol */
+        gap: 10px;
         padding: 15px;
     }
-
-    .print-button, .arrears-button {
-        width: 100%; /* Buat tombol lebar penuh */
-        margin-left: 0; /* Hapus margin kiri dari tombol arrears */
+    .nominal-input-container {
+        width: 100%;
+        margin-left: 0;
+        justify-content: space-between;
     }
-}
-
-
-/* style.css */
-
-/* ... kode CSS yang sudah ada ... */
-
-/* NEW: Style for Arrears Button */
-.arrears-button {
-    background-color: #ff9800; /* Orange color for arrears button */
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: inline-flex; /* Align icon and text */
-    align-items: center;
-    gap: 8px; /* Space between icon and text */
-    margin-left: 10px; /* Space from print button */
-}
-
-.arrears-button:hover {
-    background-color: #e68900; /* Darker orange on hover */
-}
-
-/* Ensure these buttons are hidden in print media */
-@media print {
-    /* ... existing print styles ... */
+    .payment-checkbox {
+        margin-left: 0;
+    }
+    .manual-input-row {
+        flex-direction: column;
+        gap: 10px;
+    }
     .print-button-container {
-        display: none !important; /* Hide the entire button container */
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Perbaikan untuk tombol 'Cek Pembayaran' dan 'Hubungi WhatsApp' */
+    .hero .button,
+    .whatsapp-button {
+        width: auto; /* Menggunakan lebar sesuai konten, bukan 100% */
+        display: inline-block; /* Agar bisa di-center dengan text-align */
+        max-width: 80%; /* Batasi lebar agar tidak terlalu besar */
     }
 }
 
-/* ... sisa kode CSS Anda ... */
+/* === Print Slip Styles === */
+@media print {
+    body > *:not(.slip-container) {
+        display: none !important;
+    }
+    html, body {
+        background-color: white;
+    }
+    .slip-container {
+        width: 100%;
+        max-width: 80mm;
+        margin: 0;
+        padding: 5px;
+        border: none;
+        box-shadow: none;
+        font-size: 10pt;
+    }
+    .header-slip img { max-width: 50px; }
+    .header-slip h2 { font-size: 1em; }
+    .header-slip p { font-size: 0.7em; }
+    .payment-table th, .payment-table td { padding: 3px; }
+    .status-lunas { color: #28A745 !important; -webkit-print-color-adjust: exact; }
+    .status-belum { color: #DC3545 !important; -webkit-print-color-adjust: exact; }
+    .status-tertunda { color: #FFC107 !important; -webkit-print-color-adjust: exact; }
+    .print-button-container, .manual-payment-container {
+        display: none !important;
+    }
+}
