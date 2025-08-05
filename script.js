@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // === Konfigurasi SPP ===
     const SPP_NOMINAL_AMOUNT = 90000; // Nominal SPP setiap bulan
-    const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya
+    const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya (tidak digunakan lagi untuk penentuan tunggakan)
     const SPP_MONTHS_ACADEMIC_ORDER = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
 
     // === Ambil Elemen DOM ===
@@ -27,14 +27,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const printSlipButton = document.getElementById('printSlipButton');
     const printArrearsButton = document.getElementById('printArrearsButton'); 
     
+    const manualPaymentNameInput = document.getElementById('manualPaymentName');
+    const manualPaymentNominalInput = document.getElementById('manualPaymentNominal');
+    const addManualPaymentBtn = document.getElementById('addManualPaymentBtn');
+    const manualPaymentList = document.getElementById('manualPaymentList');
+
     printSlipButton.style.display = 'none'; 
     printArrearsButton.style.display = 'none'; 
 
     let allPaymentData = [];
     let currentStudentData = null; 
+    let manualArrears = []; 
 
-    // List of payment columns in the order you want them on the slip
-    // Pastikan nama kolom ini SAMA PERSIS dengan header di Google Sheet Anda
     const paymentColumns = [
         'PPDB',
         'Status_SPP_Juli', 'Status_SPP_Agustus', 'Status_SPP_September', 'Status_SPP_Oktober',
@@ -51,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
         'P5 1'
     ];
 
-    // === Fungsi Mengambil Data dari Google Sheet ===
     async function fetchPaymentData() {
         try {
             const response = await fetch(googleSheetUrl);
@@ -69,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // === Fungsi Parsing CSV ===
     function parseCSV(csvText) {
         const lines = csvText.split('\n').filter(line => line.trim() !== '');
         if (lines.length === 0) return [];
@@ -110,7 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return data;
     }
 
-    // === Fungsi Mendapatkan Kelas CSS Berdasarkan Status ===
     function getStatusClass(statusText) {
         const lowerCaseStatus = statusText ? statusText.toLowerCase().trim() : '';
         if (lowerCaseStatus === 'lunas') {
@@ -123,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return ''; 
     }
 
-    // Fungsi untuk memformat angka menjadi format mata uang Rupiah
     function formatRupiah(amount) {
         if (amount === null || amount === undefined || isNaN(amount) || amount === '') {
              return 'Rp 0'; 
@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }).format(numericAmount);
     }
 
-    // Helper function to get 0-indexed calendar month from month name
     function getCalendarMonthIndex(monthName) {
         const monthMap = {
             'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
@@ -148,10 +147,30 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return monthMap[monthName];
     }
+    
+    function displayManualPayments() {
+        manualPaymentList.innerHTML = '';
+        manualArrears.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${item.name} - ${formatRupiah(item.nominal)}</span>
+                <button class="remove-manual-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
+            `;
+            manualPaymentList.appendChild(li);
+        });
+        
+        document.querySelectorAll('.remove-manual-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = this.dataset.index;
+                manualArrears.splice(index, 1);
+                displayManualPayments();
+            });
+        });
+    }
 
-    // === Fungsi Menampilkan Detail Siswa ===
     function displayStudentDetails(studentData) {
         currentStudentData = studentData; 
+        manualArrears = []; 
 
         if (!studentData) { 
             studentDetailsContainer.style.display = 'none';
@@ -167,6 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
         printSlipButton.style.display = 'inline-flex'; 
         printArrearsButton.style.display = 'inline-flex'; 
         noResultsMessage.style.display = 'none'; 
+        
+        displayManualPayments();
 
         studentNameSpan.textContent = studentData['Nama Siswa'] || '-';
         studentNISNSpan.textContent = studentData['NISN'] || '-';
@@ -203,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // === Fungsi Melakukan Pencarian ===
     function performSearch() {
         const studentSearchTerm = searchInput.value.toLowerCase().trim();
         const parentSearchTerm = parentNameInput.value.toLowerCase().trim();
@@ -242,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // === Fungsi untuk Membuat dan Mencetak Slip Pembayaran Umum ===
     function generatePrintSlip(studentData, selectedPayments) { 
         if (!studentData || selectedPayments.length === 0) {
             alert('Tidak ada data siswa atau pembayaran yang dipilih untuk dicetak. Mohon lakukan pencarian dan pilih pembayaran.');
@@ -385,7 +404,6 @@ document.addEventListener('DOMContentLoaded', function() {
         printWindow.print(); 
     }
 
-    // === NEW: Fungsi untuk Membuat dan Mencetak Slip Tagihan Tunggakan Gabungan ===
     function generateCombinedArrearsSlip(studentData) {
         if (!studentData) {
             alert('Tidak ada data siswa untuk membuat tagihan tunggakan.');
@@ -400,17 +418,14 @@ document.addEventListener('DOMContentLoaded', function() {
         let arrearsItems = [];
         let totalArrearsNominal = 0;
 
-        // Indeks kalender untuk bulan Juli (sebagai awal tahun ajaran)
         const ACADEMIC_YEAR_START_MONTH_CAL_INDEX = getCalendarMonthIndex('Juli'); 
         
-        // Iterasi melalui semua kolom pembayaran
         paymentColumns.forEach(colName => {
             const status = studentData[colName];
 
             // Cek apakah statusnya BELUM LUNAS atau TERTUNDA
             if (status && (status.toLowerCase().trim() === 'belum lunas' || status.toLowerCase().trim() === 'tertunda')) {
                 
-                // Ambil nominal dari input di UI jika ada, jika tidak, gunakan nilai default SPP
                 const nominalInput = document.getElementById(`nominal-${colName}`);
                 let nominalValue = 0;
                 if (nominalInput) {
@@ -422,36 +437,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 let displayColName = colName;
                 if (colName.startsWith('Status_SPP_')) {
                     const monthName = colName.replace('Status_SPP_', '');
-                    const sppCalendarMonthIndex = getCalendarMonthIndex(monthName);
-                    
-                    let sppAcademicOrderIndex;
-                    if (sppCalendarMonthIndex >= ACADEMIC_YEAR_START_MONTH_CAL_INDEX) {
-                        sppAcademicOrderIndex = sppCalendarMonthIndex - ACADEMIC_YEAR_START_MONTH_CAL_INDEX;
-                    } else {
-                        sppAcademicOrderIndex = sppCalendarMonthIndex + (12 - ACADEMIC_YEAR_START_MONTH_CAL_INDEX);
-                    }
-
-                    let currentAcademicOrderIndex;
-                    if (currentMonthCalendarIndex >= ACADEMIC_YEAR_START_MONTH_CAL_INDEX) {
-                        currentAcademicOrderIndex = currentMonthCalendarIndex - ACADEMIC_YEAR_START_MONTH_CAL_INDEX;
-                    } else {
-                        currentAcademicOrderIndex = currentMonthCalendarIndex + (12 - ACADEMIC_YEAR_START_MONTH_CAL_INDEX);
-                    }
-                    
-                    // Cek apakah sudah melewati tanggal jatuh tempo
-                    if (sppAcademicOrderIndex < currentAcademicOrderIndex || 
-                        (sppAcademicOrderIndex === currentAcademicOrderIndex && currentDay > SPP_DUE_DAY)) {
-                        
-                        displayColName = `SPP ${monthName}`;
-                        arrearsItems.push({
-                            name: displayColName,
-                            nominal: nominalValue
-                        });
-                        totalArrearsNominal += nominalValue;
-                    }
-
+                    displayColName = `SPP ${monthName}`;
+                    arrearsItems.push({
+                        name: displayColName,
+                        nominal: nominalValue
+                    });
+                    totalArrearsNominal += nominalValue;
                 } else {
-                    // Untuk pembayaran non-SPP, langsung masukkan ke daftar tunggakan
                     displayColName = colName.replace(/_/g, ' '); 
                     arrearsItems.push({
                         name: displayColName,
@@ -460,6 +452,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     totalArrearsNominal += nominalValue;
                 }
             }
+        });
+        
+        manualArrears.forEach(item => {
+            arrearsItems.push(item);
+            totalArrearsNominal += item.nominal;
         });
 
         if (arrearsItems.length === 0) {
@@ -627,13 +624,31 @@ document.addEventListener('DOMContentLoaded', function() {
         generatePrintSlip(currentStudentData, selectedPayments); 
     });
 
-    // Panggil fungsi yang baru
     printArrearsButton.addEventListener('click', function() {
         if (!currentStudentData) {
             alert('Tidak ada data siswa yang ditemukan. Mohon lakukan pencarian terlebih dahulu.');
             return;
         }
         generateCombinedArrearsSlip(currentStudentData);
+    });
+    
+    addManualPaymentBtn.addEventListener('click', function() {
+        const name = manualPaymentNameInput.value.trim();
+        const nominal = parseInt(manualPaymentNominalInput.value);
+
+        if (name === '' || isNaN(nominal) || nominal <= 0) {
+            alert('Mohon isi nama pembayaran dan nominal yang valid (angka positif).');
+            return;
+        }
+
+        manualArrears.push({
+            name: name,
+            nominal: nominal
+        });
+
+        manualPaymentNameInput.value = '';
+        manualPaymentNominalInput.value = '';
+        displayManualPayments();
     });
 
     searchInput.addEventListener('keypress', function(event) {
