@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const formData = new FormData(manualPaymentForm);
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzXe5UATwKiRpVhi-fIh2x4lzl-K6BNYirzKnEDka5kkT8iOafmh7vO9owJ5d9ERHQN/exec'; // GANTI DENGAN URL SCRIPT ANDA
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbye6GMmHH24bYPaf9VichMbBx3UesY3jK3mMdHuO3Jlk6gp74xrmUM4uZfVL-3PI2kH/exec'; // GANTI DENGAN URL SCRIPT ANDA
 
         try {
             const response = await fetch(scriptURL, {
@@ -29,4 +29,5 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Terjadi kesalahan. Silakan coba lagi.');
         }
     });
+
 });
