@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi Utama ===
-    // PASTIKAN URL INI BENAR SESUAI PUBLIKASI CSV DARI GOOGLE SHEET ANDA!
     const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; // URL Google Sheet Anda yang baru
     const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; // Path ke logo sekolah Anda
     const schoolName = "TK Islam Arruhaniyah";
     const schoolAddress = "Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia";
     const contactPerson = "Pak Ridhan Fauzi"; // Nama Admin yang tanda tangan di slip
     const contactNumber = "083879667121";
-    
+
     // === Konfigurasi SPP ===
     const SPP_NOMINAL_AMOUNT = 90000; // Nominal SPP setiap bulan
-    const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya (tidak digunakan lagi untuk penentuan tunggakan)
+    const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya
     const SPP_MONTHS_ACADEMIC_ORDER = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
 
     // === Ambil Elemen DOM ===
@@ -25,19 +24,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const parentNameDetailSpan = document.getElementById('parentNameDetail');
     const paymentCardsContainer = document.getElementById('paymentCardsContainer');
     const printSlipButton = document.getElementById('printSlipButton');
-    const printArrearsButton = document.getElementById('printArrearsButton'); 
+    const printArrearsButton = document.getElementById('printArrearsButton');
     
     const manualPaymentNameInput = document.getElementById('manualPaymentName');
     const manualPaymentNominalInput = document.getElementById('manualPaymentNominal');
     const addManualPaymentBtn = document.getElementById('addManualPaymentBtn');
     const manualPaymentList = document.getElementById('manualPaymentList');
 
-    printSlipButton.style.display = 'none'; 
-    printArrearsButton.style.display = 'none'; 
+    printSlipButton.style.display = 'none';
+    printArrearsButton.style.display = 'none';
 
     let allPaymentData = [];
-    let currentStudentData = null; 
-    let manualArrears = []; 
+    let currentStudentData = null;
+    let manualPayments = []; // Menggunakan array ini untuk pembayaran manual yang ingin dicetak
+    let manualArrears = []; // Menggunakan array ini untuk pembayaran manual yang dimasukkan
 
     const paymentColumns = [
         'PPDB',
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'Status_SPP_November', 'Status_SPP_Desember', 'Status_SPP_Januari', 'Status_SPP_Februari',
         'Status_SPP_Maret', 'Status_SPP_April', 'Status_SPP_Mei', 'Status_SPP_Juni',
         'Porseni',
-        'Membatik', 
+        'Membatik',
         'Polisi_Cinta_Anak',
         'Transportasi_Umum',
         'Raport',
@@ -60,14 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(googleSheetUrl);
             const csvText = await response.text();
             
-            console.log("Raw CSV Text:", csvText.substring(0, 500)); 
-            allPaymentData = parseCSV(csvText); 
-            console.log("Parsed Data:", allPaymentData); 
+            console.log("Raw CSV Text:", csvText.substring(0, 500));
+            allPaymentData = parseCSV(csvText);
+            console.log("Parsed Data:", allPaymentData);
 
         } catch (error) {
             console.error('Error fetching data:', error);
             noResultsMessage.textContent = 'Gagal memuat data pembayaran. Silakan coba lagi nanti. Cek koneksi internet atau URL Google Sheet.';
-            noResultsMessage.classList.add('error'); 
+            noResultsMessage.classList.add('error');
             noResultsMessage.style.display = 'block';
         }
     }
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (lines.length === 0) return [];
 
         const headers = lines[0].split(',').map(header => header.replace(/^"|"$/g, '').trim());
-        console.log("Parsed Headers:", headers); 
+        console.log("Parsed Headers:", headers);
 
         const data = [];
 
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (values.length !== headers.length) {
                 console.warn(`Skipping malformed row (header/value count mismatch): Line ${i + 1} - "${lines[i]}"`);
                 console.warn(`Expected ${headers.length} values, got ${values.length}. Values:`, values);
-                continue; 
+                continue;
             }
             const row = {};
             headers.forEach((header, index) => {
@@ -121,12 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (lowerCaseStatus === 'tertunda' || lowerCaseStatus === 'proses') {
             return 'status-tertunda';
         }
-        return ''; 
+        return '';
     }
 
     function formatRupiah(amount) {
         if (amount === null || amount === undefined || isNaN(amount) || amount === '') {
-             return 'Rp 0'; 
+             return 'Rp 0';
         }
         const numericAmount = parseFloat(amount);
         if (isNaN(numericAmount)) {
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
-            minimumFractionDigits: 0, 
+            minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(numericAmount);
     }
@@ -148,9 +148,35 @@ document.addEventListener('DOMContentLoaded', function() {
         return monthMap[monthName];
     }
     
-    function displayManualPayments() {
+    // Fungsi untuk menambah pembayaran manual
+    function addManualPayment() {
+        const name = manualPaymentNameInput.value.trim();
+        const nominal = parseInt(manualPaymentNominalInput.value);
+
+        if (name === '' || isNaN(nominal) || nominal <= 0) {
+            alert('Mohon isi nama pembayaran dan nominal yang valid (angka positif).');
+            return;
+        }
+
+        // Tambahkan pembayaran manual ke array manualPayments
+        manualPayments.push({
+            name: name,
+            nominal: nominal,
+            status: 'Lunas'
+        });
+
+        // Kosongkan input
+        manualPaymentNameInput.value = '';
+        manualPaymentNominalInput.value = '';
+
+        // Tampilkan daftar pembayaran manual yang diperbarui
+        renderManualPayments();
+    }
+    
+    // Fungsi untuk menampilkan daftar pembayaran manual di UI
+    function renderManualPayments() {
         manualPaymentList.innerHTML = '';
-        manualArrears.forEach((item, index) => {
+        manualPayments.forEach((item, index) => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <span>${item.name} - ${formatRupiah(item.nominal)}</span>
@@ -159,51 +185,52 @@ document.addEventListener('DOMContentLoaded', function() {
             manualPaymentList.appendChild(li);
         });
         
+        // Tambahkan event listener untuk tombol hapus
         document.querySelectorAll('.remove-manual-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const index = this.dataset.index;
-                manualArrears.splice(index, 1);
-                displayManualPayments();
+                manualPayments.splice(index, 1);
+                renderManualPayments();
             });
         });
     }
 
-    function displayStudentDetails(studentData) {
-        currentStudentData = studentData; 
-        manualArrears = []; 
 
-        if (!studentData) { 
+    function displayStudentDetails(studentData) {
+        currentStudentData = studentData;
+        manualPayments = []; // Reset manual payments saat data siswa baru dimuat
+        renderManualPayments(); // Tampilkan daftar kosong
+
+        if (!studentData) {
             studentDetailsContainer.style.display = 'none';
-            printSlipButton.style.display = 'none'; 
-            printArrearsButton.style.display = 'none'; 
-            noResultsMessage.textContent = 'Data siswa tidak ditemukan.'; 
-            noResultsMessage.classList.add('error'); 
+            printSlipButton.style.display = 'none';
+            printArrearsButton.style.display = 'none';
+            noResultsMessage.textContent = 'Data siswa tidak ditemukan.';
+            noResultsMessage.classList.add('error');
             noResultsMessage.style.display = 'block';
             return;
         }
 
-        studentDetailsContainer.style.display = 'block'; 
-        printSlipButton.style.display = 'inline-flex'; 
-        printArrearsButton.style.display = 'inline-flex'; 
-        noResultsMessage.style.display = 'none'; 
+        studentDetailsContainer.style.display = 'block';
+        printSlipButton.style.display = 'inline-flex';
+        printArrearsButton.style.display = 'inline-flex';
+        noResultsMessage.style.display = 'none';
         
-        displayManualPayments();
-
         studentNameSpan.textContent = studentData['Nama Siswa'] || '-';
         studentNISNSpan.textContent = studentData['NISN'] || '-';
         studentClassSpan.textContent = studentData['Kelas'] || '-';
         parentNameDetailSpan.textContent = studentData['Nama Orang Tua'] || '-';
 
-        paymentCardsContainer.innerHTML = ''; 
+        paymentCardsContainer.innerHTML = '';
 
         paymentColumns.forEach(colName => {
             const status = studentData[colName];
             if (status !== undefined && status !== null && status.trim() !== '') {
                 let displayColName = colName;
                 if (colName.startsWith('Status_SPP_')) {
-                    displayColName = colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' '); 
+                    displayColName = colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' ');
                 } else if (colName.includes('_')) {
-                    displayColName = colName.replace(/_/g, ' '); 
+                    displayColName = colName.replace(/_/g, ' ');
                 }
                 
                 const paymentItemDiv = document.createElement('div');
@@ -228,16 +255,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const studentSearchTerm = searchInput.value.toLowerCase().trim();
         const parentSearchTerm = parentNameInput.value.toLowerCase().trim();
         
-        studentDetailsContainer.style.display = 'none'; 
-        noResultsMessage.style.display = 'none'; 
-        printSlipButton.style.display = 'none'; 
-        printArrearsButton.style.display = 'none'; 
+        studentDetailsContainer.style.display = 'none';
+        noResultsMessage.style.display = 'none';
+        printSlipButton.style.display = 'none';
+        printArrearsButton.style.display = 'none';
 
         if (studentSearchTerm === '' || parentSearchTerm === '') {
             noResultsMessage.textContent = 'Mohon isi Nama Siswa/NISN dan Nama Orang Tua.';
-            noResultsMessage.classList.add('info'); 
+            noResultsMessage.classList.add('info');
             noResultsMessage.style.display = 'block';
-            displayStudentDetails(null); 
+            displayStudentDetails(null);
             return;
         }
 
@@ -249,20 +276,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const studentMatch = (studentName.includes(studentSearchTerm) || nisn.includes(studentSearchTerm));
             const parentMatch = parentName.includes(parentSearchTerm);
             
-            return studentMatch && parentMatch; 
+            return studentMatch && parentMatch;
         });
 
         if (foundStudent) {
-            displayStudentDetails(foundStudent); 
+            displayStudentDetails(foundStudent);
         } else {
             noResultsMessage.textContent = 'Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.';
-            noResultsMessage.classList.add('error'); 
-            noResultsMessage.style.display = 'block'; 
-            displayStudentDetails(null); 
+            noResultsMessage.classList.add('error');
+            noResultsMessage.style.display = 'block';
+            displayStudentDetails(null);
         }
     }
 
-    function generatePrintSlip(studentData, selectedPayments) { 
+    function generatePrintSlip(studentData, selectedPayments) {
         if (!studentData || selectedPayments.length === 0) {
             alert('Tidak ada data siswa atau pembayaran yang dipilih untuk dicetak. Mohon lakukan pencarian dan pilih pembayaran.');
             return;
@@ -273,24 +300,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         let paymentItemsHtml = '';
-        let totalNominal = 0; 
+        let totalNominal = 0;
 
         selectedPayments.forEach(payment => {
-            let displayColName = payment.colName;
-            if (payment.colName.startsWith('Status_SPP_')) {
-                displayColName = payment.colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' '); 
-            } else if (payment.colName.includes('_')) {
-                displayColName = payment.colName.replace(/_/g, ' '); 
+            // Cek jika ini pembayaran manual
+            if (payment.isManual) {
+                 paymentItemsHtml += `
+                    <tr>
+                        <td>${payment.name}</td>
+                        <td class="nominal-cell">${formatRupiah(payment.nominal)}</td>
+                        <td class="status-cell ${getStatusClass('Lunas')}">${'Lunas'}</td>
+                    </tr>
+                `;
+            } else {
+                let displayColName = payment.colName;
+                if (payment.colName.startsWith('Status_SPP_')) {
+                    displayColName = payment.colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' ');
+                } else if (payment.colName.includes('_')) {
+                    displayColName = payment.colName.replace(/_/g, ' ');
+                }
+                
+                paymentItemsHtml += `
+                    <tr>
+                        <td>${displayColName}</td>
+                        <td class="nominal-cell">${formatRupiah(payment.nominal)}</td>
+                        <td class="status-cell ${getStatusClass(payment.status)}">${payment.status}</td>
+                    </tr>
+                `;
             }
-            
-            paymentItemsHtml += `
-                <tr>
-                    <td>${displayColName}</td>
-                    <td class="nominal-cell">${formatRupiah(payment.nominal)}</td>
-                    <td class="status-cell ${getStatusClass(payment.status)}">${payment.status}</td>
-                </tr>
-            `;
-            totalNominal += (payment.nominal || 0); 
+            totalNominal += (payment.nominal || 0);
         });
 
         const printContent = `
@@ -317,13 +355,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     .payment-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8em; }
                     .payment-table th, .payment-table td { border: 1px solid #ddd; padding: 5px; text-align: left; }
                     .payment-table th { background-color: #f5f5f5; font-weight: 600; }
-                    .nominal-cell { text-align: right; } 
+                    .nominal-cell { text-align: right; }
                     .status-cell { text-align: center; font-weight: bold; }
-                    .total-row { font-weight: bold; background-color: #e9e9e9; } 
-                    .total-row td { border-top: 2px solid #333; } 
+                    .total-row { font-weight: bold; background-color: #e9e9e9; }
+                    .total-row td { border-top: 2px solid #333; }
 
                     .status-lunas { color: #4CAF50 !important; -webkit-print-color-adjust: exact; }
-                    .status-belum { color: #F44336 !important; -webkit-print-color-adjust: exact; } 
+                    .status-belum { color: #F44336 !important; -webkit-print-color-adjust: exact; }
                     .status-tertunda { color: #FFC107 !important; -webkit-print-color-adjust: exact; }
                     .signature { margin-top: 20px; text-align: right; font-size: 0.8em; }
                     .signature p { margin: 3px 0; }
@@ -400,8 +438,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const printWindow = window.open('', '_blank');
         printWindow.document.write(printContent);
         printWindow.document.close();
-        printWindow.focus(); 
-        printWindow.print(); 
+        printWindow.focus();
+        printWindow.print();
     }
 
     function generateCombinedArrearsSlip(studentData) {
@@ -412,13 +450,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const currentMonthCalendarIndex = currentDate.getMonth(); 
+        const currentMonthCalendarIndex = currentDate.getMonth();
         const currentDay = currentDate.getDate();
 
         let arrearsItems = [];
         let totalArrearsNominal = 0;
 
-        const ACADEMIC_YEAR_START_MONTH_CAL_INDEX = getCalendarMonthIndex('Juli'); 
+        const ACADEMIC_YEAR_START_MONTH_CAL_INDEX = getCalendarMonthIndex('Juli');
         
         paymentColumns.forEach(colName => {
             const status = studentData[colName];
@@ -444,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     totalArrearsNominal += nominalValue;
                 } else {
-                    displayColName = colName.replace(/_/g, ' '); 
+                    displayColName = colName.replace(/_/g, ' ');
                     arrearsItems.push({
                         name: displayColName,
                         nominal: nominalValue
@@ -453,10 +491,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
-        manualArrears.forEach(item => {
-            arrearsItems.push(item);
-            totalArrearsNominal += item.nominal;
+
+        // Tambahkan pembayaran manual ke dalam daftar tunggakan
+        manualPayments.forEach(item => {
+             arrearsItems.push(item);
+             totalArrearsNominal += item.nominal;
         });
 
         if (arrearsItems.length === 0) {
@@ -499,15 +538,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     .payment-table th, .payment-table td { border: 1px solid #ddd; padding: 5px; text-align: left; }
                     .payment-table th { background-color: #f5f5f5; font-weight: 600; }
                     .nominal-cell { text-align: right; }
-                    .total-row { font-weight: bold; background-color: #e9e9e9; } 
-                    .total-row td { border-top: 2px solid #333; } 
+                    .total-row { font-weight: bold; background-color: #e9e9e9; }
+                    .total-row td { border-top: 2px solid #333; }
                     .signature { margin-top: 20px; text-align: right; font-size: 0.8em; }
                     .signature p { margin: 3px 0; }
                     .signature .admin-name { margin-top: 30px; border-top: 1px solid #333; display: inline-block; padding-top: 5px; }
                     .footer-slip { text-align: center; margin-top: 15px; font-size: 0.7em; color: #888; }
                     .important-note {
                         font-size: 0.8em;
-                        color: #D32F2F; 
+                        color: #D32F2F;
                         text-align: center;
                         margin-top: 10px;
                         font-weight: bold;
@@ -583,8 +622,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const printWindow = window.open('', '_blank');
         printWindow.document.write(printContent);
         printWindow.document.close();
-        printWindow.focus(); 
-        printWindow.print(); 
+        printWindow.focus();
+        printWindow.print();
     }
     
     // === Event Listeners ===
@@ -597,15 +636,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const selectedPayments = [];
-        const checkboxes = document.querySelectorAll('.payment-checkbox:checked'); 
+        const checkboxes = document.querySelectorAll('.payment-checkbox:checked');
 
-        if (checkboxes.length === 0) {
-            alert('Pilih setidaknya satu pembayaran yang ingin dicetak!');
+        if (checkboxes.length === 0 && manualPayments.length === 0) {
+            alert('Pilih setidaknya satu pembayaran atau tambahkan pembayaran manual yang ingin dicetak!');
             return;
         }
 
+        // Ambil pembayaran dari Google Sheet yang dicentang
         checkboxes.forEach(checkbox => {
-            const colName = checkbox.dataset.colName; 
+            const colName = checkbox.dataset.colName;
             const paymentItemDiv = checkbox.closest('.payment-item-card');
             const statusSpan = paymentItemDiv.querySelector('.payment-status');
             const nominalInput = paymentItemDiv.querySelector('.nominal-input');
@@ -615,13 +655,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (colName && statusSpan) {
                 selectedPayments.push({
                     colName: colName,
-                    status: statusSpan.textContent, 
-                    nominal: nominalValue 
+                    status: statusSpan.textContent,
+                    nominal: nominalValue,
+                    isManual: false
                 });
             }
         });
-
-        generatePrintSlip(currentStudentData, selectedPayments); 
+        
+        // Gabungkan dengan pembayaran manual
+        const allPaymentsToPrint = [...selectedPayments, ...manualPayments];
+        
+        // Panggil fungsi cetak dengan data gabungan
+        generatePrintSlip(currentStudentData, allPaymentsToPrint);
+        
+        // Opsional: kosongkan daftar manual setelah dicetak
+        manualPayments = [];
+        renderManualPayments();
     });
 
     printArrearsButton.addEventListener('click', function() {
@@ -632,24 +681,8 @@ document.addEventListener('DOMContentLoaded', function() {
         generateCombinedArrearsSlip(currentStudentData);
     });
     
-    addManualPaymentBtn.addEventListener('click', function() {
-        const name = manualPaymentNameInput.value.trim();
-        const nominal = parseInt(manualPaymentNominalInput.value);
-
-        if (name === '' || isNaN(nominal) || nominal <= 0) {
-            alert('Mohon isi nama pembayaran dan nominal yang valid (angka positif).');
-            return;
-        }
-
-        manualArrears.push({
-            name: name,
-            nominal: nominal
-        });
-
-        manualPaymentNameInput.value = '';
-        manualPaymentNominalInput.value = '';
-        displayManualPayments();
-    });
+    // Event listener untuk tombol Tambah pembayaran manual
+    addManualPaymentBtn.addEventListener('click', addManualPayment);
 
     searchInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
@@ -664,4 +697,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetchPaymentData();
 });
-
