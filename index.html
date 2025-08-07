@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Pembayaran Siswa TK Islam Arruhaniyah</title>
+    <title>Pembayaran Siswa TK Islam Arruhaniyah</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -14,7 +14,7 @@
             <div class="header-branding">
                 <img src="img/ARRUHANIYAH 3.png" alt="Logo TK Islam Arruhaniyah" class="school-logo">
                 <div>
-                    <h1>Sistem Informasi Pembayaran Siswa TK Islam Arruhaniyah</h1>
+                    <h1>TK Islam Arruhaniyah</h1>
                     <p>Tahun Pelajaran 2025/2026</p>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                     <h4><i class="fas fa-plus-circle"></i> Tambah Pembayaran Manual untuk Tagihan</h4>
                     <div class="manual-input-row">
                         <input type="text" id="manualPaymentName" placeholder="Nama Pembayaran (cth: Uang Buku)" aria-label="Nama Pembayaran Manual">
-                        <input type="number" id="manualPaymentNominal" placeholder="Nominal (cth: 50000)" aria-label="Nominal Pembayaran Manual" min="0">
+                        <input type="number" id="manualPaymentNominal" placeholder="Nominal (cth: 150000)" aria-label="Nominal Pembayaran Manual" min="0">
                         <button id="addManualPaymentBtn" class="button"><i class="fas fa-plus"></i> Tambah</button>
                     </div>
                     <ul id="manualPaymentList">
@@ -75,58 +75,7 @@
                     <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
                     <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan</button>
                 </div>
-
-                <section id="payment-input">
-                    <h3><i class="fas fa-plus-circle"></i> Input Pembayaran Baru</h3>
-                    <p>Gunakan form ini untuk mencatat pembayaran yang masuk dari orang tua/wali siswa.</p>
-                    <form id="manualPaymentForm">
-                         <input type="hidden" id="inputNamaSiswa" name="namaSiswa">
-                        <input type="hidden" id="inputNamaOrangTua" name="namaOrangTua">
-                        
-                        <div class="form-group">
-                            <label>Nama Siswa:</label>
-                            <p class="auto-filled-value" id="displayedNamaSiswa"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Nama Orang Tua:</label>
-                            <p class="auto-filled-value" id="displayedNamaOrangTua"></p>
-                        </div>
-                        <div class="form-group">
-                            <label for="jenisPembayaran">Jenis Pembayaran:</label>
-                            <select id="jenisPembayaran" name="jenisPembayaran" required>
-                                <option value="">Pilih Jenis Pembayaran</option>
-                                <option value="PPDB">PPDB</option>
-                                <option value="SPP_Juli">SPP Juli</option>
-                                <option value="SPP_Agustus">SPP Agustus</option>
-                                <option value="SPP_September">SPP September</option>
-                                <option value="SPP_Oktober">SPP Oktober</option>
-                                <option value="SPP_November">SPP November</option>
-                                <option value="SPP_Desember">SPP Desember</option>
-                                <option value="SPP_Januari">SPP Januari</option>
-                                <option value="SPP_Februari">SPP Februari</option>
-                                <option value="SPP_Maret">SPP Maret</option>
-                                <option value="SPP_April">SPP April</option>
-                                <option value="SPP_Mei">SPP Mei</option>
-                                <option value="SPP_Juni">SPP Juni</option>
-                                <option value="Porseni">Porseni</option>
-                                <option value="Membatik">Membatik</option>
-                                <option value="Polisi_Cinta_Anak">Polisi Cinta Anak</option>
-                                <option value="Transportasi_Umum">Transportasi Umum</option>
-                                <option value="Raport">Raport</option>
-                                <option value="Buku LKS">Buku LKS</option>
-                                <option value="Foto Wisuda">Foto Wisuda</option>
-                                <option value="Akhir Tahun">Akhir Tahun</option>
-                                <option value="P5 1">P5 1</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="nominalPembayaran">Nominal Pembayaran:</label>
-                            <input type="number" id="nominalPembayaran" name="nominalPembayaran" required min="0" placeholder="Nominal Pembayaran (cth: 50000)">
-                        </div>
-                        <button type="submit" class="button submit-button"><i class="fas fa-save"></i> Simpan Pembayaran</button>
-                    </form>
-                </section>
-                </div>
+            </div>
 
             <p id="noResults" class="message-box" style="display:none;">Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
             
@@ -146,8 +95,9 @@
                         <li>SPP Bulanan</li>
                         <li>Uang Pangkal & Pendaftaran</li>
                         <li>Kegiatan Akhir Tahun</li>
-                        <li>Seragam & Buku</li>
-                        <li>Dan Lainnya...</li>
+                        <li>Kegiatan Membatik</li>
+                        <li>Kegiatan Edutrip LRT Jakarta</li>
+                        <li>Kegiatan lainnya...</li>
                     </ul>
                 </div>
                 <div class="info-card">
@@ -156,13 +106,21 @@
                         <li>
                             <div class="payment-method">
                                 <span class="method-name">Bayar Langsung</span>
-                                <span class="method-details">Silakan kunjungi loket tata usaha sekolah.</span>
+                                <span class="method-details">Silakan kunjungi Kantor sekolah, sebelumnya harapan menghubungi Pak Ridhan.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="payment-method">
+                                <span class="method-name">Transfer Bank</span>
+                                <span class="method-details">- </span>
+                                <span class="method-details">A/N: TK Islam Arruhaniyah</span>
                             </div>
                         </li>
                     </ul>
                 </div>
             </div>
         </section>
+
     </main>
 
     <footer>
@@ -183,6 +141,5 @@
     </button>
 
     <script src="script.js"></script>
-    <script src="send_data.js"></script>
-    </body>
+</body>
 </html>
