@@ -1,145 +1,145 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pembayaran Siswa TK Islam Arruhaniyah</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran Siswa TK Islam Arruhaniyah</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-branding">
-                <img src="img/ARRUHANIYAH 3.png" alt="Logo TK Islam Arruhaniyah" class="school-logo">
-                <div>
-                    <h1>TK Islam Arruhaniyah</h1>
-                    <p>Tahun Pelajaran 2025/2026</p>
-                </div>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#home">Beranda</a></li>
-                    <li><a href="#payment-check">Cek Pembayaran</a></li>
-                    <li><a href="#payment-info">Info Pembayaran</a></li>
-                    <li><a href="#contact">Kontak Kami</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <header>
+        <div class="container">
+            <div class="header-branding">
+                <img src="img/ARRUHANIYAH 3.png" alt="Logo TK Islam Arruhaniyah" class="school-logo">
+                <div>
+                    <h1>TK Islam Arruhaniyah</h1>
+                    <p>Tahun Pelajaran 2025/2026</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Beranda</a></li>
+                    <li><a href="#payment-check">Cek Pembayaran</a></li>
+                    <li><a href="#payment-info">Info Pembayaran</a></li>
+                    <li><a href="#contact">Kontak Kami</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-    <main class="container">
-        <section id="home" class="hero">
-            <h2>Selamat Datang, Orang Tua Hebat!</h2>
-            <p>Pantau status pembayaran putra/putri Anda dengan mudah dan transparan di sini.</p>
-            <a href="#payment-check" class="button">Cek Pembayaran Sekarang</a>
-        </section>
+    <main class="container">
+        <section id="home" class="hero">
+            <h2>Selamat Datang, Orang Tua Hebat!</h2>
+            <p>Pantau status pembayaran putra/putri Anda dengan mudah dan transparan di sini.</p>
+            <a href="#payment-check" class="button">Cek Pembayaran Sekarang</a>
+        </section>
 
-        <section id="payment-check">
-            <h2>Cek Status Pembayaran Siswa</h2>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Cari Nama Siswa atau NISN..." aria-label="Cari Nama Siswa atau NISN">
-                <input type="text" id="parentNameInput" placeholder="Masukkan Nama Ibu..." aria-label="Masukkan Nama Ibu">
-                <button id="searchButton" class="button">Cari Data</button>
-            </div>
-            
-            <div id="loadingMessage" class="message-box info" style="display: none;">
-                <p><i class="fas fa-spinner fa-spin"></i> Memuat data pembayaran, mohon tunggu...</p>
-            </div>
-            <div id="errorMessage" class="message-box error" style="display: none;">
-                <p><i class="fas fa-exclamation-triangle"></i> Gagal memuat data. Mohon cek koneksi internet atau URL publik Google Sheet Anda.</p>
-            </div>
-            <div id="studentDetails" class="student-details" style="display: none;">
-                <h3>Detail Pembayaran untuk <span id="studentName"></span> (NISN: <span id="studentNISN"></span>)</h3>
-                <p>Kelas: <span id="studentClass"></span></p>
-                <p>Nama Orang Tua: <span id="parentNameDetail"></span></p>
-                
-                <h4>Daftar Pembayaran</h4>
-                <p class="instruction-text">Centang pembayaran yang ingin dicetak dan masukkan nominal (jika ada).</p>
-                <div class="payment-cards-container" id="paymentCardsContainer">
-                </div>
+        <section id="payment-check">
+            <h2>Cek Status Pembayaran Siswa</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Cari Nama Siswa atau NISN..." aria-label="Cari Nama Siswa atau NISN">
+                <input type="text" id="parentNameInput" placeholder="Masukkan Nama Ibu..." aria-label="Masukkan Nama Ibu">
+                <button id="searchButton" class="button">Cari Data</button>
+            </div>
+            
+            <div id="loadingMessage" class="message-box info" style="display: none;">
+                <p><i class="fas fa-spinner fa-spin"></i> Memuat data pembayaran, mohon tunggu...</p>
+            </div>
+            <div id="errorMessage" class="message-box error" style="display: none;">
+                <p><i class="fas fa-exclamation-triangle"></i> Gagal memuat data. Mohon cek koneksi internet atau URL publik Google Sheet Anda.</p>
+            </div>
+            <div id="studentDetails" class="student-details" style="display: none;">
+                <h3>Detail Pembayaran untuk <span id="studentName"></span> (NISN: <span id="studentNISN"></span>)</h3>
+                <p>Kelas: <span id="studentClass"></span></p>
+                <p>Nama Orang Tua: <span id="parentNameDetail"></span></p>
+                
+                <h4>Daftar Pembayaran</h4>
+                <p class="instruction-text">Centang pembayaran yang ingin dicetak dan masukkan nominal (jika ada).</p>
+                <div class="payment-cards-container" id="paymentCardsContainer">
+                </div>
 
-                                <div class="manual-payment-container">
-                    <h4><i class="fas fa-plus-circle"></i> Tambah Pembayaran Manual untuk Tagihan</h4>
-                    <div class="manual-input-row">
-                        <input type="text" id="manualPaymentName" placeholder="Nama Pembayaran (cth: Uang Buku)" aria-label="Nama Pembayaran Manual">
-                        <input type="number" id="manualPaymentNominal" placeholder="Nominal (cth: 150000)" aria-label="Nominal Pembayaran Manual" min="0">
-                        <button id="addManualPaymentBtn" class="button"><i class="fas fa-plus"></i> Tambah</button>
-                    </div>
-                    <ul id="manualPaymentList">
-                    </ul>
-                </div>
-                
-                <div class="print-button-container">
-                    <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
-                    <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan</button>
-                </div>
-            </div>
+                <div class="manual-payment-container">
+                    <h4><i class="fas fa-plus-circle"></i> Tambah Pembayaran Manual untuk Tagihan</h4>
+                    <div class="manual-input-row">
+                        <input type="text" id="manualPaymentName" placeholder="Nama Pembayaran (cth: Uang Buku)" aria-label="Nama Pembayaran Manual">
+                        <input type="number" id="manualPaymentNominal" placeholder="Nominal (cth: 150000)" aria-label="Nominal Pembayaran Manual" min="0">
+                        <button id="addManualPaymentBtn" class="button"><i class="fas fa-plus"></i> Tambah</button>
+                    </div>
+                    <ul id="manualPaymentList">
+                        </ul>
+                </div>
+                
+                <div class="print-button-container">
+                    <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
+                    <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan</button>
+                </div>
+            </div>
 
-            <p id="noResults" class="message-box" style="display:none;">Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
-            
-            <p class="status-info">
-                <span class="status-lunas">Lunas</span> | 
-                <span class="status-belum">Belum Lunas</span> | 
-                <span class="status-tertunda">Tertunda</span>
-            </p>
-        </section>
+            <p id="noResults" class="message-box" style="display:none;">Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
+            
+            <p class="status-info">
+                <span class="status-lunas">Lunas</span> | 
+                <span class="status-belum">Belum Lunas</span> | 
+                <span class="status-tertunda">Tertunda</span>
+            </p>
+        </section>
 
-        <section id="payment-info">
-            <h2>Jenis &amp; Cara Pembayaran</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3><i class="fas fa-list-alt"></i> Jenis Pembayaran</h3>
-                    <ul>
-                        <li>SPP Bulanan</li>
-                        <li>Uang Pangkal & Pendaftaran</li>
-                        <li>Kegiatan Akhir Tahun</li>
-                        <li>Kegiatan Membatik</li>
-                        <li>Kegiatan Edutrip LRT Jakarta</li>
-                        <li>Kegiatan lainnya...</li>
-                    </ul>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-money-check-alt"></i> Cara Pembayaran</h3>
-                    <ul>
-                        <li>
-                            <div class="payment-method">
-                                <span class="method-name">Bayar Langsung</span>
-                                <span class="method-details">Silakan kunjungi Kantor sekolah, sebelumnya harapan menghubungi Pak Ridhan.</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="payment-method">
-                                <span class="method-name">Transfer Bank</span>
-                                <span class="method-details">- </span>
-                                <span class="method-details">A/N: TK Islam Arruhaniyah</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+        <section id="payment-info">
+            <h2>Jenis &amp; Cara Pembayaran</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-list-alt"></i> Jenis Pembayaran</h3>
+                    <ul>
+                        <li>SPP Bulanan</li>
+                        <li>Uang Pangkal & Pendaftaran</li>
+                        <li>Kegiatan Akhir Tahun</li>
+                        <li>Kegiatan Membatik</li>
+                        <li>Kegiatan Edutrip LRT Jakarta</li>
+                        <li>Kegiatan lainnya...</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-money-check-alt"></i> Cara Pembayaran</h3>
+                    <ul>
+                        <li>
+                            <div class="payment-method">
+                                <span class="method-name">Bayar Langsung</span>
+                                <span class="method-details">Silakan kunjungi Kantor sekolah, sebelumnya harapan menghubungi Pak Ridhan.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="payment-method">
+                                <span class="method-name">Transfer Bank</span>
+                                <span class="method-details">- </span>
+                                <span class="method-details">A/N: TK Islam Arruhaniyah</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-    </main>
+    </main>
 
-    <footer>
-        <div class="container">
-            <section id="contact">
-                <h2>Kontak Kami</h2>
-                <p>Silakan hubungi kami jika Anda memiliki pertanyaan atau membutuhkan bantuan.</p>
-                <p><strong>Alamat Sekolah:</strong> Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia</p>
-                <p><strong>WhatsApp (Pak Ridhan Fauzi):</strong> 087783049121</p>
-                <a href="https://wa.me/qr/DHHAD233DTTEN1" target="_blank" class="button whatsapp-button">Hubungi Via WhatsApp</a>
-            </section>
-            <p>&copy; 2025 TK Islam Arruhaniyah.<br> Semua Hak Dilindungi.</p>
-        </div>
-    </footer>
-    
-    <button id="scrollToTopBtn" title="Scroll to top" aria-label="Scroll to top of page">
-        <i class="fa-regular fa-circle-up"></i>
-    </button>
+    <footer>
+        <div class="container">
+            <section id="contact">
+                <h2>Kontak Kami</h2>
+                <p>Silakan hubungi kami jika Anda memiliki pertanyaan atau membutuhkan bantuan.</p>
+                <p><strong>Alamat Sekolah:</strong> Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia</p>
+                <p><strong>WhatsApp (Pak Ridhan Fauzi):</strong> 087783049121</p>
+                <a href="https://wa.me/qr/DHHAD233DTTEN1" target="_blank" class="button whatsapp-button">Hubungi Via WhatsApp</a>
+            </section>
+            <p>&copy; 2025 TK Islam Arruhaniyah.<br> Semua Hak Dilindungi.</p>
+        </div>
+    </footer>
+    
+    <button id="scrollToTopBtn" title="Scroll to top" aria-label="Scroll to top of page">
+        <i class="fa-regular fa-circle-up"></i>
+    </button>
 
-    <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
