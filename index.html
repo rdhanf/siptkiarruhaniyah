@@ -43,46 +43,78 @@
                 <input type="text" id="parentNameInput" placeholder="Masukkan Nama Ibu..." aria-label="Masukkan Nama Ibu">
                 <button id="searchButton" class="button">Cari Data</button>
             </div>
-            
+
             <div id="loadingMessage" class="message-box info" style="display: none;">
                 <p><i class="fas fa-spinner fa-spin"></i> Memuat data pembayaran, mohon tunggu...</p>
             </div>
-            <div id="errorMessage" class="message-box error" style="display: none;">
-                <p><i class="fas fa-exclamation-triangle"></i> Gagal memuat data. Mohon cek koneksi internet atau URL publik Google Sheet Anda.</p>
+            <div id="noResults" class="message-box error" style="display:none;">
+                <p><i class="fas fa-exclamation-triangle"></i> Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
             </div>
+
             <div id="studentDetails" class="student-details" style="display: none;">
                 <h3>Detail Pembayaran untuk <span id="studentName"></span> (NISN: <span id="studentNISN"></span>)</h3>
                 <p>Kelas: <span id="studentClass"></span></p>
                 <p>Nama Orang Tua: <span id="parentNameDetail"></span></p>
-                
+
                 <h4>Daftar Pembayaran</h4>
                 <p class="instruction-text">Centang pembayaran yang ingin dicetak dan masukkan nominal (jika ada).</p>
                 <div class="payment-cards-container" id="paymentCardsContainer">
-                </div>
-
-                <div class="manual-payment-container">
-                    <h4><i class="fas fa-plus-circle"></i> Tambah Pembayaran Manual untuk Tagihan</h4>
-                    <div class="manual-input-row">
-                        <input type="text" id="manualPaymentName" placeholder="Nama Pembayaran (cth: Uang Buku)" aria-label="Nama Pembayaran Manual">
-                        <input type="number" id="manualPaymentNominal" placeholder="Nominal (cth: 150000)" aria-label="Nominal Pembayaran Manual" min="0">
-                        <button id="addManualPaymentBtn" class="button"><i class="fas fa-plus"></i> Tambah</button>
                     </div>
-                    <ul id="manualPaymentList">
-                        </ul>
+
+                    <div class="manual-payment-section card">
+                        <div class="card-header">
+                            <i class="fas fa-money-check-alt"></i> Tambah Pembayaran Manual
+                        </div>
+                        <div class="card-body">
+                            <p class="section-description">Untuk pembayaran yang tidak terdaftar di Google Sheet.</p>
+                            <div class="manual-input-grid">
+                                <div class="input-group">
+                                    <label for="manualPaymentName">Nama Pembayaran:</label>
+                                    <input type="text" id="manualPaymentName" placeholder="Contoh: Sumbangan, Infak" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="manualPaymentTotal">Total Nominal Tagihan:</label>
+                                    <input type="number" id="manualPaymentTotal" placeholder="0" min="0" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="manualPaymentNominal">Nominal yang Dibayar:</label>
+                                    <input type="number" id="manualPaymentNominal" placeholder="0" min="0" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="manualPaymentStatus">Status Pembayaran:</label>
+                                    <select id="manualPaymentStatus">
+                                        <option value="Lunas">Lunas</option>
+                                        <option value="Bayar Sebagian">Bayar Sebagian</option>
+                                        <option value="Belum Lunas">Belum Lunas</option>
+                                    </select>
+                                </div>
+                                <div class="input-group full-width">
+                                    <label for="manualPaymentDate">Tanggal Pembayaran:</label>
+                                    <input type="date" id="manualPaymentDate">
+                                </div>
+                                <div class="input-group checkbox-group full-width">
+                                    <input type="checkbox" id="manualIncludePayment" checked>
+                                    <label for="manualIncludePayment">Sertakan pembayaran ini di slip cetak</label>
+                                </div>
+                            </div>
+                            <button id="addManualPaymentBtn" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Tambah Pembayaran</button>
+                            
+                            <ul id="manualPaymentList" class="manual-list">
+                                </ul>
+                        </div>
+                    </div>
                 </div>
-                
                 <div class="print-button-container">
                     <button id="printSlipButton" class="button print-button" style="display: none;"><i class="fas fa-print"></i> Cetak Slip Pembayaran Terpilih</button>
                     <button id="printArrearsButton" class="button arrears-button" style="display: none;"><i class="fas fa-file-invoice-dollar"></i> Cetak Tagihan Tunggakan</button>
                 </div>
             </div>
-
-            <p id="noResults" class="message-box" style="display:none;">Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.</p>
             
             <p class="status-info">
                 <span class="status-lunas">Lunas</span> | 
                 <span class="status-belum">Belum Lunas</span> | 
-                <span class="status-tertunda">Tertunda</span>
+                <span class="status-tertunda">Tertunda</span> |
+                <span class="status-tertunda">Bayar Sebagian</span>
             </p>
         </section>
 
@@ -135,7 +167,7 @@
             <p>&copy; 2025 TK Islam Arruhaniyah.<br> Semua Hak Dilindungi.</p>
         </div>
     </footer>
-    
+
     <button id="scrollToTopBtn" title="Scroll to top" aria-label="Scroll to top of page">
         <i class="fa-regular fa-circle-up"></i>
     </button>
