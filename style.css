@@ -767,19 +767,21 @@ footer #contact p {
     }
 }
 
-/* === Print Slip Styles === */
 @media print {
-    /* Atur font monospace untuk semua elemen di dalam slip, sesuai dengan gambar */
+    /* Atur font monospace, tebal, dan ukuran 25px untuk semua elemen */
     body {
         font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
         margin: 0;
         padding: 0;
-        font-size: 14px; /* Ukuran font dasar yang jelas */
+        font-size: 25px; /* Ukuran font diubah menjadi 25px */
     }
 
-    /* Override font-family agar semua elemen menggunakannya */
+    /* Override font-family dan font-weight agar semua elemen menggunakannya */
     p, h1, h2, h3, h4, span, table, td, th {
         font-family: 'Courier New', Courier, monospace;
+        font-weight: bold; /* Dibuat tebal */
+        font-size: 25px; /* Diubah menjadi 25px */
     }
     
     /* Ukuran kertas dan margin */
@@ -800,9 +802,9 @@ footer #contact p {
     /* Header */
     .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; }
     .header img { max-width: 60px; margin-bottom: 5px; }
-    .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; }
-    .header p { margin: 0; font-size: 12px; line-height: 1.2; }
-    .header .info-sekolah { font-size: 10px; }
+    .header h1 { margin: 0; font-size: 25px; text-transform: uppercase; }
+    .header p { margin: 0; font-size: 25px; line-height: 1.2; }
+    .header .info-sekolah { font-size: 25px; }
 
     /* Garis pemisah */
     .divider { 
@@ -813,15 +815,15 @@ footer #contact p {
 
     /* Detail Siswa */
     .details-section { margin-bottom: 5px; }
-    .details-section h3 { margin: 0 0 5px; font-size: 12px; border-bottom: 1px dashed #000; padding-bottom: 3px; }
-    .details-section p { margin: 2px 0; font-size: 12px; display: flex; justify-content: space-between; }
+    .details-section h3 { margin: 0 0 5px; font-size: 25px; border-bottom: 1px dashed #000; padding-bottom: 3px; }
+    .details-section p { margin: 2px 0; font-size: 25px; display: flex; justify-content: space-between; }
     .details-section p span:last-child { text-align: right; }
 
     /* Konten Pembayaran */
     .payment-list { margin-bottom: 18px; }
     .payment-item { margin-bottom: 5px; }
-    .payment-name { font-size: 14px; margin: 0; font-weight: bold; }
-    .payment-detail { font-size: 12px; margin: 1px 0; }
+    .payment-name { font-size: 25px; margin: 0; font-weight: bold; }
+    .payment-detail { font-size: 25px; margin: 1px 0; }
     
     /* Tabel (untuk Bukti Pembayaran dan Tunggakan) */
     .payment-table {
@@ -832,7 +834,7 @@ footer #contact p {
     .payment-table th, .payment-table td {
         border-bottom: 1px dashed #000;
         padding: 5px 0;
-        font-size: 12px;
+        font-size: 25px;
         text-align: left;
     }
     .payment-table th {
@@ -859,7 +861,7 @@ footer #contact p {
     }
     .total-row p { 
         font-weight: bold; 
-        font-size: 14px; 
+        font-size: 25px; 
         margin: 2px 0; 
         display: flex; 
         justify-content: space-between; 
@@ -867,7 +869,7 @@ footer #contact p {
 
     /* Footer */
     .footer { text-align: center; margin-top: 13px; }
-    .footer p { margin: 2px 0; font-size: 12px; }
+    .footer p { margin: 2px 0; font-size: 25px; }
     .signature-box { 
         display: inline-block; 
         border-bottom: 1px solid #000; 
@@ -876,13 +878,13 @@ footer #contact p {
     }
     .signature-label { 
         margin-top: 5px; 
-        font-size: 12px;
+        font-size: 25px;
     }
     .notice { 
         margin-top: 15px; 
         padding: 5px; 
         border: 1px dashed #000; 
-        font-size: 10px;
+        font-size: 25px;
     }
 
     /* Status Warna */
@@ -901,3 +903,4 @@ footer #contact p {
         display: none !important;
     }
 }
+
