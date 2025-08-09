@@ -315,79 +315,149 @@ main section {
 
 
 /* === Manual Payment Input === */
-.manual-payment-container {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px dashed var(--border-color);
+/* Mengganti kode CSS lama dengan yang baru */
+.manual-payment-section {
+    margin-top: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
 }
 
-.manual-payment-container h4 {
+.manual-payment-section .card-header {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--primary-color);
-    font-size: 1.2em;
-    margin-bottom: 15px;
 }
 
-.manual-input-row {
+.manual-payment-section .card-body {
+    padding: 1.5rem;
+}
+
+.manual-payment-section .section-description {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 1.5rem;
+}
+
+.manual-input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.input-group {
     display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.input-group.checkbox-group {
+    flex-direction: row;
+    align-items: center;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
-.manual-input-row input {
-    flex-grow: 1;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+.input-group.checkbox-group input {
+    width: auto;
 }
 
-#addManualPaymentBtn {
-    background-color: var(--secondary-color);
-    color: white;
-    border-radius: 8px;
-    padding: 0 15px;
-    font-size: 1.2em;
+.input-group.full-width {
+    grid-column: 1 / -1; /* Menempati seluruh lebar grid */
 }
 
-#addManualPaymentBtn:hover {
-    background-color: #5BA2AF;
+/* Tombol Tambah Pembayaran Manual */
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
 }
 
-#manualPaymentList {
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+/* Daftar Pembayaran Manual */
+.manual-list {
     list-style: none;
     padding: 0;
-    margin: 0;
-    border-top: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
 }
 
-#manualPaymentList li {
+.manual-list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 1em;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95rem;
 }
 
-#manualPaymentList li:last-child {
+.manual-list li:last-child {
     border-bottom: none;
 }
 
-.remove-manual-btn {
-    background: none;
+.manual-list li span {
+    color: #333;
+}
+
+.manual-list .remove-manual-btn {
+    background-color: #f44336;
+    color: #fff;
     border: none;
-    color: var(--status-belum);
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 1.1em;
-    transition: color 0.2s ease;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    transition: background-color 0.3s ease;
 }
 
-.remove-manual-btn:hover {
-    color: #A03240;
+.manual-list .remove-manual-btn:hover {
+    background-color: #d32f2f;
 }
-
 
 /* === Print Buttons === */
 .print-button-container {
@@ -657,10 +727,23 @@ footer #contact p {
     .payment-checkbox {
         margin-left: 0;
     }
-    .manual-input-row {
-        flex-direction: column;
-        gap: 10px;
+    
+    /* Tombol Tambah Pembayaran Manual */
+    .btn-primary {
+        width: 100%;
     }
+    
+    /* Daftar Pembayaran Manual */
+    .manual-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .manual-list li span {
+        width: 100%;
+        word-wrap: break-word; /* Mencegah teks keluar dari batas */
+    }
+    
     .print-button-container {
         flex-direction: column;
         gap: 10px;
@@ -673,33 +756,148 @@ footer #contact p {
         display: inline-block; /* Agar bisa di-center dengan text-align */
         max-width: 80%; /* Batasi lebar agar tidak terlalu besar */
     }
+
+    /* === Perubahan untuk tampilan mobile pada manual payment grid === */
+    .manual-input-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .input-group.full-width {
+        grid-column: auto;
+    }
 }
 
 /* === Print Slip Styles === */
 @media print {
-    body > *:not(.slip-container) {
-        display: none !important;
-    }
-    html, body {
-        background-color: white;
-    }
-    .slip-container {
-        width: 100%;
-        max-width: 80mm;
+    /* Atur font monospace untuk semua elemen di dalam slip, sesuai dengan gambar */
+    body {
+        font-family: 'Courier New', Courier, monospace;
         margin: 0;
-        padding: 5px;
-        border: none;
-        box-shadow: none;
-        font-size: 10pt;
+        padding: 0;
+        font-size: 14px; /* Ukuran font dasar yang jelas */
     }
-    .header-slip img { max-width: 50px; }
-    .header-slip h2 { font-size: 1em; }
-    .header-slip p { font-size: 0.7em; }
-    .payment-table th, .payment-table td { padding: 3px; }
-    .status-lunas { color: #28A745 !important; -webkit-print-color-adjust: exact; }
-    .status-belum { color: #DC3545 !important; -webkit-print-color-adjust: exact; }
-    .status-tertunda { color: #FFC107 !important; -webkit-print-color-adjust: exact; }
-    .print-button-container, .manual-payment-container {
+
+    /* Override font-family agar semua elemen menggunakannya */
+    p, h1, h2, h3, h4, span, table, td, th {
+        font-family: 'Courier New', Courier, monospace;
+    }
+    
+    /* Ukuran kertas dan margin */
+    @page { 
+        size: 90mm auto; 
+        margin: 0; 
+    }
+    body { 
+        width: 90mm; 
+        padding: 0; 
+    }
+    .slip-container { 
+        width: 100%; 
+        padding: 10px; 
+        box-sizing: border-box; 
+    }
+
+    /* Header */
+    .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; }
+    .header img { max-width: 60px; margin-bottom: 5px; }
+    .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; }
+    .header p { margin: 0; font-size: 12px; line-height: 1.2; }
+    .header .info-sekolah { font-size: 10px; }
+
+    /* Garis pemisah */
+    .divider { 
+        border-bottom: 1px dashed #000; 
+        margin: 10px 0; 
+        line-height: 0; 
+    }
+
+    /* Detail Siswa */
+    .details-section { margin-bottom: 5px; }
+    .details-section h3 { margin: 0 0 5px; font-size: 12px; border-bottom: 1px dashed #000; padding-bottom: 3px; }
+    .details-section p { margin: 2px 0; font-size: 12px; display: flex; justify-content: space-between; }
+    .details-section p span:last-child { text-align: right; }
+
+    /* Konten Pembayaran */
+    .payment-list { margin-bottom: 18px; }
+    .payment-item { margin-bottom: 5px; }
+    .payment-name { font-size: 14px; margin: 0; font-weight: bold; }
+    .payment-detail { font-size: 12px; margin: 1px 0; }
+    
+    /* Tabel (untuk Bukti Pembayaran dan Tunggakan) */
+    .payment-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    .payment-table th, .payment-table td {
+        border-bottom: 1px dashed #000;
+        padding: 5px 0;
+        font-size: 12px;
+        text-align: left;
+    }
+    .payment-table th {
+        font-weight: bold;
+    }
+    .payment-table td:nth-child(2) { /* Kolom Nominal */
+        text-align: right;
+    }
+    .payment-table th:last-child, .payment-table td:last-child {
+        text-align: right;
+    }
+    .total-row-table {
+        border-top: 1px dashed #000;
+    }
+    .total-row-table td {
+        font-weight: bold;
+    }
+    
+    /* Total Pembayaran */
+    .total-row { 
+        border-top: 1px dashed #000; 
+        padding-top: 5px; 
+        margin-top: 5px; 
+    }
+    .total-row p { 
+        font-weight: bold; 
+        font-size: 14px; 
+        margin: 2px 0; 
+        display: flex; 
+        justify-content: space-between; 
+    }
+
+    /* Footer */
+    .footer { text-align: center; margin-top: 13px; }
+    .footer p { margin: 2px 0; font-size: 12px; }
+    .signature-box { 
+        display: inline-block; 
+        border-bottom: 1px solid #000; 
+        margin-top: 20px;
+        padding: 0 40px; 
+    }
+    .signature-label { 
+        margin-top: 5px; 
+        font-size: 12px;
+    }
+    .notice { 
+        margin-top: 15px; 
+        padding: 5px; 
+        border: 1px dashed #000; 
+        font-size: 10px;
+    }
+
+    /* Status Warna */
+    .status-lunas { color: #28A745; font-weight: bold; }
+    .status-belum { color: #DC3545; font-weight: bold; }
+    .status-tertunda { color: #FFC107; font-weight: bold; }
+
+    /* Warna saat dicetak */
+    .status-lunas, .status-belum, .status-tertunda {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Sembunyikan elemen yang tidak perlu dicetak */
+    body > *:not(.slip-container) {
         display: none !important;
     }
 }
