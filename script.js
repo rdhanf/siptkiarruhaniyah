@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi Utama ===
-    // PASTIKAN URL INI BENAR SESUAI PUBLIKASI CSV DARI GOOGLE SHEET ANDA!
-    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; // URL Google Sheet Anda yang baru
-    const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; // Path ke logo sekolah Anda
+    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; 
+    const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; 
     const schoolName = "TK Islam Arruhaniyah";
     const schoolAddress = "Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia";
-    const contactPerson = "Pak Ridhan Fauzi"; // Nama Admin yang tanda tangan di slip
+    const contactPerson = "Pak Ridhan Fauzi";
     const contactNumber = "083879667121";
-    
+
     // === Konfigurasi SPP ===
-    const SPP_NOMINAL_AMOUNT = 90000; // Nominal SPP setiap bulan
-    const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya (tidak digunakan lagi untuk penentuan tunggakan)
+    const SPP_NOMINAL_AMOUNT = 90000; 
+    const SPP_DUE_DAY = 28; 
     const SPP_MONTHS_ACADEMIC_ORDER = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
 
     // === Ambil Elemen DOM ===
@@ -25,49 +24,47 @@ document.addEventListener('DOMContentLoaded', function() {
     const parentNameDetailSpan = document.getElementById('parentNameDetail');
     const paymentCardsContainer = document.getElementById('paymentCardsContainer');
     const printSlipButton = document.getElementById('printSlipButton');
-    const printArrearsButton = document.getElementById('printArrearsButton'); 
-    
+    const printArrearsButton = document.getElementById('printArrearsButton');
+    const loadingMessage = document.getElementById('loadingMessage');
+
+    // Ambil elemen DOM untuk pembayaran manual yang baru
     const manualPaymentNameInput = document.getElementById('manualPaymentName');
+    const manualPaymentTotalInput = document.getElementById('manualPaymentTotal');
     const manualPaymentNominalInput = document.getElementById('manualPaymentNominal');
+    const manualPaymentStatusSelect = document.getElementById('manualPaymentStatus');
+    const manualPaymentDateInput = document.getElementById('manualPaymentDate');
+    const manualIncludePaymentCheckbox = document.getElementById('manualIncludePayment');
     const addManualPaymentBtn = document.getElementById('addManualPaymentBtn');
     const manualPaymentList = document.getElementById('manualPaymentList');
 
-    printSlipButton.style.display = 'none'; 
-    printArrearsButton.style.display = 'none'; 
+    printSlipButton.style.display = 'none';
+    printArrearsButton.style.display = 'none';
+    studentDetailsContainer.style.display = 'none';
+    noResultsMessage.style.display = 'none';
 
     let allPaymentData = [];
-    let currentStudentData = null; 
-    let manualArrears = []; 
+    let currentStudentData = null;
+    let manualPaymentsToPrint = [];
 
     const paymentColumns = [
-        'PPDB',
-        'Status_SPP_Juli', 'Status_SPP_Agustus', 'Status_SPP_September', 'Status_SPP_Oktober',
-        'Status_SPP_November', 'Status_SPP_Desember', 'Status_SPP_Januari', 'Status_SPP_Februari',
-        'Status_SPP_Maret', 'Status_SPP_April', 'Status_SPP_Mei', 'Status_SPP_Juni',
-        'Porseni',
-        'Membatik', 
-        'Polisi_Cinta_Anak',
-        'Transportasi_Umum',
-        'Raport',
-        'Buku LKS',
-        'Foto Wisuda',
-        'Akhir Tahun',
-        'P5 1'
+        'PPDB', 'Porseni', 'Membatik', 'Polisi_Cinta_Anak', 'Transportasi_Umum', 'Raport', 'Buku LKS',
+        'Foto Wisuda', 'Akhir Tahun', 'P5 1'
     ];
+    const sppColumns = SPP_MONTHS_ACADEMIC_ORDER.map(month => `Status_SPP_${month}`);
 
     async function fetchPaymentData() {
+        loadingMessage.style.display = 'block';
         try {
             const response = await fetch(googleSheetUrl);
             const csvText = await response.text();
-            
-            console.log("Raw CSV Text:", csvText.substring(0, 500)); 
-            allPaymentData = parseCSV(csvText); 
-            console.log("Parsed Data:", allPaymentData); 
-
+            allPaymentData = parseCSV(csvText);
+            console.log("Parsed Data:", allPaymentData);
+            loadingMessage.style.display = 'none';
         } catch (error) {
             console.error('Error fetching data:', error);
-            noResultsMessage.textContent = 'Gagal memuat data pembayaran. Silakan coba lagi nanti. Cek koneksi internet atau URL Google Sheet.';
-            noResultsMessage.classList.add('error'); 
+            loadingMessage.style.display = 'none';
+            noResultsMessage.textContent = 'Gagal memuat data pembayaran. Mohon cek koneksi internet atau URL publik Google Sheet Anda.';
+            noResultsMessage.classList.add('error');
             noResultsMessage.style.display = 'block';
         }
     }
@@ -75,33 +72,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function parseCSV(csvText) {
         const lines = csvText.split('\n').filter(line => line.trim() !== '');
         if (lines.length === 0) return [];
-
+        
         const headers = lines[0].split(',').map(header => header.replace(/^"|"$/g, '').trim());
-        console.log("Parsed Headers:", headers); 
-
         const data = [];
 
         for (let i = 1; i < lines.length; i++) {
-            const values = [];
-            let inQuote = false;
-            let currentVal = '';
-            for (let j = 0; j < lines[i].length; j++) {
-                const char = lines[i][j];
-                if (char === '"') {
-                    inQuote = !inQuote;
-                } else if (char === ',' && !inQuote) {
-                    values.push(currentVal.trim());
-                    currentVal = '';
-                } else {
-                    currentVal += char;
-                }
-            }
-            values.push(currentVal.trim());
+            const values = lines[i].split(',').map(value => value.replace(/^"|"$/g, '').trim());
 
             if (values.length !== headers.length) {
-                console.warn(`Skipping malformed row (header/value count mismatch): Line ${i + 1} - "${lines[i]}"`);
-                console.warn(`Expected ${headers.length} values, got ${values.length}. Values:`, values);
-                continue; 
+                console.warn(`Skipping malformed row: Line ${i + 1}`);
+                continue;
             }
             const row = {};
             headers.forEach((header, index) => {
@@ -114,46 +94,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getStatusClass(statusText) {
         const lowerCaseStatus = statusText ? statusText.toLowerCase().trim() : '';
-        if (lowerCaseStatus === 'lunas') {
-            return 'status-lunas';
-        } else if (lowerCaseStatus === 'belum lunas') {
-            return 'status-belum';
-        } else if (lowerCaseStatus === 'tertunda' || lowerCaseStatus === 'proses') {
-            return 'status-tertunda';
-        }
-        return ''; 
+        if (lowerCaseStatus === 'lunas') { return 'status-lunas'; }
+        if (lowerCaseStatus === 'bayar sebagian') { return 'status-tertunda'; }
+        if (lowerCaseStatus === 'belum lunas') { return 'status-belum'; }
+        if (lowerCaseStatus === 'tertunda' || lowerCaseStatus === 'proses') { return 'status-tertunda'; }
+        return '';
     }
 
     function formatRupiah(amount) {
         if (amount === null || amount === undefined || isNaN(amount) || amount === '') {
-             return 'Rp 0'; 
+            return 'Rp 0';
         }
         const numericAmount = parseFloat(amount);
         if (isNaN(numericAmount)) {
             return 'Rp 0';
         }
         return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0, 
-            maximumFractionDigits: 0
+            style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0
         }).format(numericAmount);
     }
+    
+    function formatNumber(amount) {
+        if (amount === null || amount === undefined || isNaN(amount) || amount === '') {
+            return '0';
+        }
+        const numericAmount = parseFloat(amount);
+        if (isNaN(numericAmount)) {
+            return '0';
+        }
+        return new Intl.NumberFormat('id-ID').format(numericAmount);
+    }
 
-    function getCalendarMonthIndex(monthName) {
-        const monthMap = {
-            'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
-            'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
-        };
-        return monthMap[monthName];
+    function cleanNumberString(str) {
+        return str.replace(/\./g, '');
     }
     
     function displayManualPayments() {
         manualPaymentList.innerHTML = '';
-        manualArrears.forEach((item, index) => {
+        manualPaymentsToPrint.forEach((item, index) => {
             const li = document.createElement('li');
             li.innerHTML = `
-                <span>${item.name} - ${formatRupiah(item.nominal)}</span>
+                <span>${item.name} (${item.status}) - ${formatRupiah(item.nominal)}</span>
                 <button class="remove-manual-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
             `;
             manualPaymentList.appendChild(li);
@@ -161,53 +142,71 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.querySelectorAll('.remove-manual-btn').forEach(button => {
             button.addEventListener('click', function() {
-                const index = this.dataset.index;
-                manualArrears.splice(index, 1);
+                const index = parseInt(this.dataset.index);
+                manualPaymentsToPrint.splice(index, 1);
                 displayManualPayments();
+                updatePrintButtonVisibility();
             });
         });
     }
 
-    function displayStudentDetails(studentData) {
-        currentStudentData = studentData; 
-        manualArrears = []; 
+    function updatePrintButtonVisibility() {
+        const selectedCount = document.querySelectorAll('.payment-checkbox:checked').length;
+        const manualCount = manualPaymentsToPrint.length;
+        if (selectedCount > 0 || manualCount > 0) {
+            printSlipButton.style.display = 'inline-flex';
+        } else {
+            printSlipButton.style.display = 'none';
+        }
 
-        if (!studentData) { 
+        const arrearsCount = document.querySelectorAll('.payment-status.status-belum, .payment-status.status-tertunda').length;
+        if (arrearsCount > 0) {
+             printArrearsButton.style.display = 'inline-flex';
+        } else {
+             printArrearsButton.style.display = 'none';
+        }
+    }
+
+    function displayStudentDetails(studentData) {
+        currentStudentData = studentData;
+        manualPaymentsToPrint = [];
+        displayManualPayments();
+
+        if (!studentData) {
             studentDetailsContainer.style.display = 'none';
-            printSlipButton.style.display = 'none'; 
-            printArrearsButton.style.display = 'none'; 
-            noResultsMessage.textContent = 'Data siswa tidak ditemukan.'; 
-            noResultsMessage.classList.add('error'); 
-            noResultsMessage.style.display = 'block';
+            updatePrintButtonVisibility();
             return;
         }
 
-        studentDetailsContainer.style.display = 'block'; 
-        printSlipButton.style.display = 'inline-flex'; 
-        printArrearsButton.style.display = 'inline-flex'; 
-        noResultsMessage.style.display = 'none'; 
-        
-        displayManualPayments();
+        studentDetailsContainer.style.display = 'block';
+        noResultsMessage.style.display = 'none';
 
         studentNameSpan.textContent = studentData['Nama Siswa'] || '-';
         studentNISNSpan.textContent = studentData['NISN'] || '-';
         studentClassSpan.textContent = studentData['Kelas'] || '-';
         parentNameDetailSpan.textContent = studentData['Nama Orang Tua'] || '-';
 
-        paymentCardsContainer.innerHTML = ''; 
+        paymentCardsContainer.innerHTML = '';
 
-        paymentColumns.forEach(colName => {
+        const allPaymentColumns = [...sppColumns, ...paymentColumns];
+        
+        const formattedSppNominal = formatNumber(SPP_NOMINAL_AMOUNT);
+
+        allPaymentColumns.forEach(colName => {
             const status = studentData[colName];
             if (status !== undefined && status !== null && status.trim() !== '') {
                 let displayColName = colName;
                 if (colName.startsWith('Status_SPP_')) {
-                    displayColName = colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' '); 
+                    displayColName = colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' ');
                 } else if (colName.includes('_')) {
-                    displayColName = colName.replace(/_/g, ' '); 
+                    displayColName = colName.replace(/_/g, ' ');
                 }
-                
+
                 const paymentItemDiv = document.createElement('div');
                 paymentItemDiv.classList.add('payment-item-card');
+
+                const inputValue = colName.startsWith('Status_SPP_') ? formattedSppNominal : '';
+
                 paymentItemDiv.innerHTML = `
                     <div class="payment-info">
                         <span class="payment-name">${displayColName}:</span>
@@ -215,29 +214,57 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="nominal-input-container">
                         <label for="nominal-${colName}">Nominal:</label>
-                        <input type="number" id="nominal-${colName}" class="nominal-input" placeholder="0" min="0" value="${colName.startsWith('Status_SPP_') ? SPP_NOMINAL_AMOUNT : ''}">
+                        <input type="text" id="nominal-${colName}" class="nominal-input" placeholder="0" min="0" value="${inputValue}">
                     </div>
                     <input type="checkbox" class="payment-checkbox" data-col-name="${colName}">
                 `;
                 paymentCardsContainer.appendChild(paymentItemDiv);
             }
         });
+        
+        updatePrintButtonVisibility();
+
+        document.querySelectorAll('.payment-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePrintButtonVisibility);
+        });
+
+        document.querySelectorAll('.nominal-input').forEach(input => {
+            input.addEventListener('keyup', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    return;
+                }
+
+                let cleanValue = cleanNumberString(this.value);
+                if (!isNaN(cleanValue) && cleanValue.trim() !== '') {
+                    this.value = formatNumber(cleanValue);
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                let cleanValue = cleanNumberString(this.value);
+                if (isNaN(cleanValue) || cleanValue.trim() === '') {
+                    this.value = '';
+                } else {
+                    this.value = formatNumber(cleanValue);
+                }
+            });
+        });
     }
 
     function performSearch() {
         const studentSearchTerm = searchInput.value.toLowerCase().trim();
         const parentSearchTerm = parentNameInput.value.toLowerCase().trim();
-        
-        studentDetailsContainer.style.display = 'none'; 
-        noResultsMessage.style.display = 'none'; 
-        printSlipButton.style.display = 'none'; 
-        printArrearsButton.style.display = 'none'; 
+
+        studentDetailsContainer.style.display = 'none';
+        noResultsMessage.style.display = 'none';
+        updatePrintButtonVisibility();
 
         if (studentSearchTerm === '' || parentSearchTerm === '') {
             noResultsMessage.textContent = 'Mohon isi Nama Siswa/NISN dan Nama Orang Tua.';
-            noResultsMessage.classList.add('info'); 
+            noResultsMessage.classList.remove('error');
+            noResultsMessage.classList.add('info');
             noResultsMessage.style.display = 'block';
-            displayStudentDetails(null); 
+            displayStudentDetails(null);
             return;
         }
 
@@ -248,149 +275,139 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const studentMatch = (studentName.includes(studentSearchTerm) || nisn.includes(studentSearchTerm));
             const parentMatch = parentName.includes(parentSearchTerm);
-            
-            return studentMatch && parentMatch; 
+
+            return studentMatch && parentMatch;
         });
 
         if (foundStudent) {
-            displayStudentDetails(foundStudent); 
+            displayStudentDetails(foundStudent);
         } else {
             noResultsMessage.textContent = 'Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.';
-            noResultsMessage.classList.add('error'); 
-            noResultsMessage.style.display = 'block'; 
-            displayStudentDetails(null); 
+            noResultsMessage.classList.remove('info');
+            noResultsMessage.classList.add('error');
+            noResultsMessage.style.display = 'block';
+            displayStudentDetails(null);
         }
     }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+    }
 
-    function generatePrintSlip(studentData, selectedPayments) { 
-        if (!studentData || selectedPayments.length === 0) {
-            alert('Tidak ada data siswa atau pembayaran yang dipilih untuk dicetak. Mohon lakukan pencarian dan pilih pembayaran.');
+    function generatePrintSlip(studentData, combinedPayments) {
+        if (!studentData || combinedPayments.length === 0) {
+            alert('Tidak ada data siswa atau pembayaran yang dipilih untuk dicetak.');
             return;
         }
 
-        const currentDate = new Date().toLocaleDateString('id-ID', {
-            day: '2-digit', month: 'long', year: 'numeric'
-        });
+        const currentDate = new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'});
 
         let paymentItemsHtml = '';
-        let totalNominal = 0; 
+        let totalNominal = 0;
 
-        selectedPayments.forEach(payment => {
-            let displayColName = payment.colName;
-            if (payment.colName.startsWith('Status_SPP_')) {
-                displayColName = payment.colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' '); 
-            } else if (payment.colName.includes('_')) {
-                displayColName = payment.colName.replace(/_/g, ' '); 
+        combinedPayments.forEach(payment => {
+            let displayColName = payment.colName || payment.name;
+            let status = payment.status || 'Lunas';
+            let nominalBayar = payment.nominal || 0;
+            let nominalTotal = payment.total || nominalBayar;
+            let sisaBayar = nominalTotal - nominalBayar;
+            let tanggalBayar = payment.date ? formatDate(payment.date) : 'Hari Ini';
+
+            if (payment.colName && payment.colName.startsWith('Status_SPP_')) {
+                displayColName = `SPP ${payment.colName.replace('Status_SPP_', '')}`;
+            } else if (payment.colName && payment.colName.includes('_')) {
+                displayColName = payment.colName.replace(/_/g, ' ');
             }
             
             paymentItemsHtml += `
-                <tr>
-                    <td>${displayColName}</td>
-                    <td class="nominal-cell">${formatRupiah(payment.nominal)}</td>
-                    <td class="status-cell ${getStatusClass(payment.status)}">${payment.status}</td>
-                </tr>
+                <div class="payment-item">
+                    <p class="payment-name"><strong>${displayColName}</strong></p>
+                    <p class="payment-detail">Nominal: ${formatRupiah(nominalBayar)}</p>
+                    <p class="payment-detail">Status: <span class="${getStatusClass(status)}">${status}</span></p>
+                    ${sisaBayar > 0 ? `<p class="sisa-tagihan">Sisa: ${formatRupiah(sisaBayar)}</p>` : ''}
+                    <p class="payment-detail">Tanggal: ${tanggalBayar}</p>
+                    <div class="divider"></div>
+                </div>
             `;
-            totalNominal += (payment.nominal || 0); 
+            totalNominal += nominalBayar;
         });
-
+        
         const printContent = `
             <html>
             <head>
                 <title>Slip Pembayaran - ${studentData['Nama Siswa']}</title>
                 <style>
-                    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; color: #333; }
-                    .slip-container { 
-                        width: 100%; 
-                        max-width: 80mm; 
-                        margin: 0 auto; 
-                        padding: 10px; 
-                        box-sizing: border-box; 
-                        border: none; 
-                    }
-                    .header-slip { text-align: center; margin-bottom: 15px; }
-                    .header-slip img { max-width: 50px; height: auto; margin-bottom: 5px; }
-                    .header-slip h2 { margin: 5px 0; font-size: 1em; color: #333; }
-                    .header-slip p { margin: 2px 0; font-size: 0.7em; color: #666; }
-                    .section-title { font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.8em; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
-                    .info-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.8em; }
-                    .info-row span:first-child { font-weight: 500; }
-                    .payment-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8em; }
-                    .payment-table th, .payment-table td { border: 1px solid #ddd; padding: 5px; text-align: left; }
-                    .payment-table th { background-color: #f5f5f5; font-weight: 600; }
-                    .nominal-cell { text-align: right; } 
-                    .status-cell { text-align: center; font-weight: bold; }
-                    .total-row { font-weight: bold; background-color: #e9e9e9; } 
-                    .total-row td { border-top: 2px solid #333; } 
-
-                    .status-lunas { color: #4CAF50 !important; -webkit-print-color-adjust: exact; }
-                    .status-belum { color: #F44336 !important; -webkit-print-color-adjust: exact; } 
-                    .status-tertunda { color: #FFC107 !important; -webkit-print-color-adjust: exact; }
-                    .signature { margin-top: 20px; text-align: right; font-size: 0.8em; }
-                    .signature p { margin: 3px 0; }
-                    .signature .admin-name { margin-top: 30px; border-top: 1px solid #333; display: inline-block; padding-top: 5px; }
-                    .footer-slip { text-align: center; margin-top: 15px; font-size: 0.7em; color: #888; }
-                    
+                    body { font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; font-size: 10px; }
+                    .slip-container { width: 300px; padding: 10px; box-sizing: border-box; }
+                    .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; }
+                    .header img { max-width: 60px; margin-bottom: 5px; }
+                    .header h1 { margin: 0; font-size: 14px; text-transform: uppercase; }
+                    .header p { margin: 0; font-size: 9px; line-height: 1.2; }
+                    .separator { margin: 5px 0; text-align: center; font-size: 9px; }
+                    .details-section { margin-bottom: 5px; }
+                    .details-section h3 { margin: 0 0 5px; font-size: 11px; border-bottom: 1px dashed #000; padding-bottom: 3px; }
+                    .details-section p { margin: 2px 0; font-size: 10px; }
+                    .payment-list { margin-bottom: 10px; }
+                    .payment-item { margin-bottom: 5px; }
+                    .payment-name { font-size: 11px; margin: 0; }
+                    .payment-detail { font-size: 10px; margin: 1px 0; }
+                    .divider { border-bottom: 1px dashed #000; margin-top: 5px; }
+                    .total-row { border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; }
+                    .total-row p { font-weight: bold; font-size: 11px; margin: 2px 0; display: flex; justify-content: space-between; }
+                    .footer { text-align: center; margin-top: 10px; }
+                    .footer p { margin: 2px 0; font-size: 10px; }
+                    .signature-box { margin-top: 15px; }
+                    .signature-box p { margin: 0; }
+                    .status-lunas { color: green; font-weight: bold; }
+                    .status-belum { color: red; font-weight: bold; }
+                    .status-tertunda { color: orange; font-weight: bold; }
+                    .sisa-tagihan { font-size: 9px; color: red; }
                     @media print {
-                        body { margin: 0; padding: 0; }
-                        .slip-container { border: none; padding: 0; }
-                        * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+                        @page { size: 80mm auto; margin: 0; }
+                        body { width: 80mm; padding: 0; }
+                        .slip-container { width: 100%; }
                     }
                 </style>
             </head>
             <body>
                 <div class="slip-container">
-                    <div class="header-slip">
+                    <div class="header">
                         <img src="${schoolLogoPath}" alt="Logo Sekolah">
-                        <h2>${schoolName}</h2>
+                        <h1>${schoolName}</h1>
                         <p>${schoolAddress}</p>
-                        <p>Telp/WA: ${contactNumber}</p>
                     </div>
 
-                    <div class="section-title">BUKTI PEMBAYARAN SISWA</div>
-                    <div class="info-row">
-                        <span>Tanggal Cetak:</span> <span>${currentDate}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Nama Siswa:</span> <span>${studentData['Nama Siswa'] || '-'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>NISN:</span> <span>${studentData['NISN'] || '-'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Kelas:</span> <span>${studentData['Kelas'] || '-'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Nama Orang Tua:</span> <span>${studentData['Nama Orang Tua'] || '-'}</span>
+                    <p class="separator">--- SLIP PEMBAYARAN ---</p>
+
+                    <div class="details-section">
+                        <p><strong>Nama Siswa:</strong> ${studentData['Nama Siswa']}</p>
+                        <p><strong>Kelas:</strong> ${studentData['Kelas']}</p>
+                        <p><strong>NISN:</strong> ${studentData['NISN']}</p>
+                        <p><strong>Nama Orang Tua:</strong> ${studentData['Nama Orang Tua']}</p>
+                        <p><strong>Tanggal Cetak:</strong> ${currentDate}</p>
+                        <div class="divider"></div>
                     </div>
 
-                    <div class="section-title">RINCIAN PEMBAYARAN</div>
-                    <table class="payment-table">
-                        <thead>
-                            <tr>
-                                <th>Jenis Pembayaran</th>
-                                <th>Nominal</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${paymentItemsHtml}
-                            <tr class="total-row">
-                                <td colspan="2">TOTAL PEMBAYARAN</td>
-                                <td class="nominal-cell">${formatRupiah(totalNominal)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="signature">
-                        <p>Bekasi, ${currentDate}</p>
-                        <p>Yang Menerima,</p>
-                        <br><br><br>
-                        <p class="admin-name">${contactPerson}</p>
+                    <div class="payment-list">
+                        ${paymentItemsHtml}
+                    </div>
+                    
+                    <div class="total-row">
+                        <p><span>TOTAL:</span> <span>${formatRupiah(totalNominal)}</span></p>
                     </div>
 
-                    <div class="footer-slip">
-                        <p>Terima kasih atas pembayaran Anda.</p>
-                        <p>Ini adalah slip pembayaran otomatis, tidak memerlukan tanda tangan basah.</p>
+                    <div class="footer">
+                        <p>Pembayaran diterima oleh,</p>
+                        <div class="signature-box">
+                            <br>
+                            <p>(_________________________)</p>
+                            <p>${contactPerson}</p>
+                        </div>
+                        <p>Terima kasih.</p>
                     </div>
                 </div>
             </body>
@@ -400,10 +417,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const printWindow = window.open('', '_blank');
         printWindow.document.write(printContent);
         printWindow.document.close();
-        printWindow.focus(); 
-        printWindow.print(); 
+        printWindow.focus();
+        printWindow.print();
     }
-
+    
     function generateCombinedArrearsSlip(studentData) {
         if (!studentData) {
             alert('Tidak ada data siswa untuk membuat tagihan tunggakan.');
@@ -411,54 +428,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const currentMonthCalendarIndex = currentDate.getMonth(); 
-        const currentDay = currentDate.getDate();
-
+        
         let arrearsItems = [];
         let totalArrearsNominal = 0;
 
-        const ACADEMIC_YEAR_START_MONTH_CAL_INDEX = getCalendarMonthIndex('Juli'); 
-        
-        paymentColumns.forEach(colName => {
+        const allPaymentColumns = [...sppColumns, ...paymentColumns];
+        allPaymentColumns.forEach(colName => {
             const status = studentData[colName];
-
-            // Cek apakah statusnya BELUM LUNAS atau TERTUNDA
-            if (status && (status.toLowerCase().trim() === 'belum lunas' || status.toLowerCase().trim() === 'tertunda')) {
-                
+            if (status && (status.toLowerCase().trim() === 'belum lunas' || status.toLowerCase().trim() === 'tertunda' || status.toLowerCase().trim() === 'bayar sebagian')) {
                 const nominalInput = document.getElementById(`nominal-${colName}`);
                 let nominalValue = 0;
                 if (nominalInput) {
-                    nominalValue = parseInt(nominalInput.value) || 0;
+                    nominalValue = parseInt(cleanNumberString(nominalInput.value)) || 0;
                 } else if (colName.startsWith('Status_SPP_')) {
                     nominalValue = SPP_NOMINAL_AMOUNT;
                 }
                 
                 let displayColName = colName;
                 if (colName.startsWith('Status_SPP_')) {
-                    const monthName = colName.replace('Status_SPP_', '');
-                    displayColName = `SPP ${monthName}`;
-                    arrearsItems.push({
-                        name: displayColName,
-                        nominal: nominalValue
-                    });
-                    totalArrearsNominal += nominalValue;
+                    displayColName = `SPP ${colName.replace('Status_SPP_', '')}`;
                 } else {
-                    displayColName = colName.replace(/_/g, ' '); 
-                    arrearsItems.push({
-                        name: displayColName,
-                        nominal: nominalValue
-                    });
-                    totalArrearsNominal += nominalValue;
+                    displayColName = colName.replace(/_/g, ' ');
                 }
+
+                arrearsItems.push({
+                    name: displayColName,
+                    nominal: nominalValue
+                });
+                totalArrearsNominal += nominalValue;
             }
         });
         
-        manualArrears.forEach(item => {
-            arrearsItems.push(item);
-            totalArrearsNominal += item.nominal;
-        });
-
         if (arrearsItems.length === 0) {
             alert('Tidak ada tunggakan pembayaran yang ditemukan untuk siswa ini.');
             return;
@@ -467,10 +467,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let arrearsItemsHtml = '';
         arrearsItems.forEach(item => {
             arrearsItemsHtml += `
-                <tr>
-                    <td>${item.name}</td>
-                    <td class="nominal-cell">${formatRupiah(item.nominal)}</td>
-                </tr>
+                <div class="arrears-item">
+                    <p><strong>${item.name}</strong></p>
+                    <p>Tagihan: ${formatRupiah(item.nominal)}</p>
+                    <div class="divider"></div>
+                </div>
             `;
         });
 
@@ -479,101 +480,73 @@ document.addEventListener('DOMContentLoaded', function() {
             <head>
                 <title>Tagihan Pembayaran - ${studentData['Nama Siswa']}</title>
                 <style>
-                    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; color: #333; }
-                    .slip-container { 
-                        width: 100%; 
-                        max-width: 80mm; 
-                        margin: 0 auto; 
-                        padding: 10px; 
-                        box-sizing: border-box; 
-                        border: none; 
-                    }
-                    .header-slip { text-align: center; margin-bottom: 15px; }
-                    .header-slip img { max-width: 50px; height: auto; margin-bottom: 5px; }
-                    .header-slip h2 { margin: 5px 0; font-size: 1em; color: #333; }
-                    .header-slip p { margin: 2px 0; font-size: 0.7em; color: #666; }
-                    .section-title { font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.8em; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
-                    .info-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.8em; }
-                    .info-row span:first-child { font-weight: 500; }
-                    .payment-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8em; }
-                    .payment-table th, .payment-table td { border: 1px solid #ddd; padding: 5px; text-align: left; }
-                    .payment-table th { background-color: #f5f5f5; font-weight: 600; }
-                    .nominal-cell { text-align: right; }
-                    .total-row { font-weight: bold; background-color: #e9e9e9; } 
-                    .total-row td { border-top: 2px solid #333; } 
-                    .signature { margin-top: 20px; text-align: right; font-size: 0.8em; }
-                    .signature p { margin: 3px 0; }
-                    .signature .admin-name { margin-top: 30px; border-top: 1px solid #333; display: inline-block; padding-top: 5px; }
-                    .footer-slip { text-align: center; margin-top: 15px; font-size: 0.7em; color: #888; }
-                    .important-note {
-                        font-size: 0.8em;
-                        color: #D32F2F; 
-                        text-align: center;
-                        margin-top: 10px;
-                        font-weight: bold;
-                    }
+                    body { font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; font-size: 10px; }
+                    .slip-container { width: 300px; padding: 10px; box-sizing: border-box; }
+                    .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; }
+                    .header img { max-width: 60px; margin-bottom: 5px; }
+                    .header h1 { margin: 0; font-size: 14px; text-transform: uppercase; }
+                    .header p { margin: 0; font-size: 9px; line-height: 1.2; }
+                    .separator { margin: 5px 0; text-align: center; font-size: 9px; }
+                    .details-section { margin-bottom: 5px; }
+                    .details-section h3 { margin: 0 0 5px; font-size: 11px; border-bottom: 1px dashed #000; padding-bottom: 3px; }
+                    .details-section p { margin: 2px 0; font-size: 10px; }
+                    .arrears-list { margin-bottom: 10px; }
+                    .arrears-item { margin-bottom: 5px; }
+                    .arrears-item p { margin: 1px 0; }
+                    .divider { border-bottom: 1px dashed #000; margin-top: 5px; }
+                    .total-row { border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; }
+                    .total-row p { font-weight: bold; font-size: 11px; margin: 2px 0; display: flex; justify-content: space-between; }
+                    .footer { text-align: center; margin-top: 10px; }
+                    .footer p { margin: 2px 0; font-size: 10px; }
+                    .signature-box { margin-top: 15px; }
+                    .signature-box p { margin: 0; }
+                    .notice { margin-top: 10px; padding: 5px; border: 1px solid #000; font-size: 9px; }
                     @media print {
-                        body { margin: 0; padding: 0; }
-                        .slip-container { border: none; padding: 0; }
-                        * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+                        @page { size: 80mm auto; margin: 0; }
+                        body { width: 80mm; padding: 0; }
+                        .slip-container { width: 100%; }
                     }
                 </style>
             </head>
             <body>
                 <div class="slip-container">
-                    <div class="header-slip">
+                    <div class="header">
                         <img src="${schoolLogoPath}" alt="Logo Sekolah">
-                        <h2>${schoolName}</h2>
+                        <h1>${schoolName}</h1>
                         <p>${schoolAddress}</p>
-                        <p>Telp/WA: ${contactNumber}</p>
                     </div>
 
-                    <div class="section-title">TAGIHAN TUNGGAKAN PEMBAYARAN</div>
-                    <div class="info-row">
-                        <span>Tanggal Cetak:</span> <span>${currentDate.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Nama Siswa:</span> <span>${studentData['Nama Siswa'] || '-'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>NISN:</span> <span>${studentData['NISN'] || '-'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Kelas:</span> <span>${studentData['Kelas'] || '-'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Nama Orang Tua:</span> <span>${studentData['Nama Orang Tua'] || '-'}</span>
+                    <p class="separator">--- TAGIHAN PEMBAYARAN ---</p>
+
+                    <div class="details-section">
+                        <p><strong>Nama Siswa:</strong> ${studentData['Nama Siswa']}</p>
+                        <p><strong>Kelas:</strong> ${studentData['Kelas']}</p>
+                        <p><strong>NISN:</strong> ${studentData['NISN']}</p>
+                        <p><strong>Nama Orang Tua:</strong> ${studentData['Nama Orang Tua']}</p>
+                        <p><strong>Tanggal Cetak:</strong> ${formatDate(currentDate.toISOString().slice(0, 10))}</p>
+                        <div class="divider"></div>
                     </div>
 
-                    <div class="section-title">RINCIAN TUNGGAKAN</div>
-                    <table class="payment-table">
-                        <thead>
-                            <tr>
-                                <th>Jenis Pembayaran</th>
-                                <th>Nominal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${arrearsItemsHtml}
-                            <tr class="total-row">
-                                <td>TOTAL TUNGGAKAN</td>
-                                <td class="nominal-cell">${formatRupiah(totalArrearsNominal)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="arrears-list">
+                        ${arrearsItemsHtml}
+                    </div>
+
+                    <div class="total-row">
+                        <p><span>TOTAL TAGIHAN:</span> <span>${formatRupiah(totalArrearsNominal)}</span></p>
+                    </div>
                     
-                    <p class="important-note">Mohon segera melunasi tunggakan pembayaran.</p>
-
-                    <div class="signature">
-                        <p>Bekasi, ${currentDate.toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}</p>
-                        <p>Admin,</p>
-                        <br><br><br>
-                        <p class="admin-name">${contactPerson}</p>
+                    <div class="notice">
+                        <p>Mohon lunasi tagihan ini.</p>
+                        <p>Jatuh Tempo: Setiap tgl. ${SPP_DUE_DAY}</p>
                     </div>
 
-                    <div class="footer-slip">
-                        <p>Terima kasih atas perhatian Anda.</p>
-                        <p>Ini adalah slip tagihan otomatis, tidak memerlukan tanda tangan basah.</p>
+                    <div class="footer">
+                        <p>Hormat kami,</p>
+                        <div class="signature-box">
+                            <br>
+                            <p>(_________________________)</p>
+                            <p>${contactPerson}</p>
+                        </div>
                     </div>
                 </div>
             </body>
@@ -583,8 +556,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const printWindow = window.open('', '_blank');
         printWindow.document.write(printContent);
         printWindow.document.close();
-        printWindow.focus(); 
-        printWindow.print(); 
+        printWindow.focus();
+        printWindow.print();
     }
     
     // === Event Listeners ===
@@ -597,31 +570,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const selectedPayments = [];
-        const checkboxes = document.querySelectorAll('.payment-checkbox:checked'); 
-
-        if (checkboxes.length === 0) {
-            alert('Pilih setidaknya satu pembayaran yang ingin dicetak!');
-            return;
-        }
+        const checkboxes = document.querySelectorAll('.payment-checkbox:checked');
 
         checkboxes.forEach(checkbox => {
-            const colName = checkbox.dataset.colName; 
+            const colName = checkbox.dataset.colName;
             const paymentItemDiv = checkbox.closest('.payment-item-card');
             const statusSpan = paymentItemDiv.querySelector('.payment-status');
             const nominalInput = paymentItemDiv.querySelector('.nominal-input');
             
-            const nominalValue = nominalInput ? parseInt(nominalInput.value) : 0;
+            const nominalValue = nominalInput ? parseInt(cleanNumberString(nominalInput.value)) || 0 : 0;
+            const statusText = statusSpan ? statusSpan.textContent.trim() : '';
 
             if (colName && statusSpan) {
                 selectedPayments.push({
                     colName: colName,
-                    status: statusSpan.textContent, 
-                    nominal: nominalValue 
+                    status: statusText,
+                    nominal: nominalValue,
+                    total: nominalValue,
+                    date: new Date().toISOString().slice(0, 10)
                 });
             }
         });
+        
+        const combinedPayments = [...selectedPayments, ...manualPaymentsToPrint];
+        
+        if (combinedPayments.length === 0) {
+            alert('Pilih setidaknya satu pembayaran atau tambahkan pembayaran manual yang ingin dicetak!');
+            return;
+        }
 
-        generatePrintSlip(currentStudentData, selectedPayments); 
+        generatePrintSlip(currentStudentData, combinedPayments);
     });
 
     printArrearsButton.addEventListener('click', function() {
@@ -634,21 +612,42 @@ document.addEventListener('DOMContentLoaded', function() {
     
     addManualPaymentBtn.addEventListener('click', function() {
         const name = manualPaymentNameInput.value.trim();
-        const nominal = parseInt(manualPaymentNominalInput.value);
+        const total = parseInt(cleanNumberString(manualPaymentTotalInput.value));
+        const nominal = parseInt(cleanNumberString(manualPaymentNominalInput.value));
+        const status = manualPaymentStatusSelect.value;
+        const date = manualPaymentDateInput.value || new Date().toISOString().slice(0, 10);
+        const includeInSlip = manualIncludePaymentCheckbox.checked;
 
-        if (name === '' || isNaN(nominal) || nominal <= 0) {
-            alert('Mohon isi nama pembayaran dan nominal yang valid (angka positif).');
+        if (name === '' || isNaN(nominal) || nominal <= 0 || isNaN(total) || total <= 0) {
+            alert('Mohon isi semua data pembayaran manual dengan nominal yang valid (angka positif).');
             return;
         }
 
-        manualArrears.push({
-            name: name,
-            nominal: nominal
-        });
+        if (includeInSlip) {
+             manualPaymentsToPrint.push({
+                 name: name,
+                 status: status,
+                 nominal: nominal,
+                 total: total,
+                 date: date
+             });
+        }
 
         manualPaymentNameInput.value = '';
+        manualPaymentTotalInput.value = '';
         manualPaymentNominalInput.value = '';
+        manualPaymentStatusSelect.value = 'Lunas';
+        manualPaymentDateInput.value = '';
+        
         displayManualPayments();
+        updatePrintButtonVisibility();
+    });
+
+    document.getElementById('manualPaymentTotal').addEventListener('keyup', function() {
+        this.value = formatNumber(cleanNumberString(this.value));
+    });
+    document.getElementById('manualPaymentNominal').addEventListener('keyup', function() {
+        this.value = formatNumber(cleanNumberString(this.value));
     });
 
     searchInput.addEventListener('keypress', function(event) {
