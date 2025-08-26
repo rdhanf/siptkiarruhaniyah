@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi Utama ===
-    // GANTI URL INI DENGAN URL CSV GOOGLE SHEET ANDA
     const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; 
     const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; 
     const schoolName = "TK Islam Arruhaniyah";
@@ -62,15 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
             allPaymentData = parseCSV(csvText); 
             
             if (allPaymentData.length > 0) {
-                // Ambil semua header kolom dari baris pertama CSV
                 const allHeaders = Object.keys(allPaymentData[0]).map(h => h.trim());
-                // Filter header untuk mendapatkan kolom pembayaran
                 paymentColumns = allHeaders.filter(header => 
                     !nonPaymentColumns.includes(header) && header.startsWith('Status_')
                 );
-
-                console.log("Parsed Data:", allPaymentData); 
-                console.log("Payment Columns:", paymentColumns); 
+                
                 if (loadingMessage) loadingMessage.style.display = 'none';
             } else {
                 if (loadingMessage) loadingMessage.style.display = 'none';
@@ -677,5 +672,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetchPaymentData();
 });
-
-
