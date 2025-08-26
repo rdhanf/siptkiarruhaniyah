@@ -672,3 +672,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetchPaymentData();
 });
+
