@@ -1,22 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi Utama ===
-    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; 
-    const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; 
+    // PASTIKAN URL INI BENAR SESUAI PUBLIKASI CSV DARI GOOGLE SHEET ANDA!
+    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; // URL Google Sheet Anda yang baru
+    const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; // Path ke logo sekolah Anda
     const schoolName = "TK Islam Arruhaniyah";
     const schoolAddress = "Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia";
-    const contactPerson = "Pak Ridhan Fauzi";
-    const contactNumber = "087783049121";
+    const contactPerson = "Pak Ridhan Fauzi"; // Nama Admin yang tanda tangan di slip
+    const contactNumber = "083879667121";
     
     // === Konfigurasi SPP ===
-    const SPP_NOMINAL_AMOUNT = 90000;
-    const SPP_DUE_DAY = 28;
+    const SPP_NOMINAL_AMOUNT = 90000; // Nominal SPP setiap bulan
+    const SPP_DUE_DAY = 28; // Tanggal jatuh tempo SPP setiap bulannya (tidak digunakan lagi untuk penentuan tunggakan)
     const SPP_MONTHS_ACADEMIC_ORDER = ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'];
 
     // === Ambil Elemen DOM ===
     const searchInput = document.getElementById('searchInput');
     const parentNameInput = document.getElementById('parentNameInput');
     const searchButton = document.getElementById('searchButton');
-    const loadingMessage = document.getElementById('loadingMessage');
     const noResultsMessage = document.getElementById('noResults');
     const studentDetailsContainer = document.getElementById('studentDetails');
     const studentNameSpan = document.getElementById('studentName');
@@ -32,81 +32,80 @@ document.addEventListener('DOMContentLoaded', function() {
     const addManualPaymentBtn = document.getElementById('addManualPaymentBtn');
     const manualPaymentList = document.getElementById('manualPaymentList');
 
-    if (printSlipButton) printSlipButton.style.display = 'none'; 
-    if (printArrearsButton) printArrearsButton.style.display = 'none'; 
+    printSlipButton.style.display = 'none'; 
+    printArrearsButton.style.display = 'none'; 
 
     let allPaymentData = [];
     let currentStudentData = null; 
     let manualArrears = []; 
-    let paymentColumns = []; 
 
-    // Kolom yang tidak dianggap sebagai pembayaran
-    const nonPaymentColumns = ['No.', 'Nama Siswa', 'NISN', 'Nama Orang Tua', 'Kelas', 'Tgl Bayar PPDB',
-                               'Tgl Bayar SPP Juli', 'Tgl Bayar SPP Agustus', 'Tgl Bayar SPP September', 
-                               'Tgl Bayar SPP Oktober', 'Tgl Bayar SPP November', 'Tgl Bayar SPP Desember', 
-                               'Tgl Bayar SPP Januari', 'Tgl Bayar SPP Februari', 'Tgl Bayar SPP Maret', 
-                               'Tgl Bayar SPP April', 'Tgl Bayar SPP Mei', 'Tgl Bayar SPP Juni'];
+    const paymentColumns = [
+        'PPDB',
+        'Status_SPP_Juli', 'Status_SPP_Agustus', 'Status_SPP_September', 'Status_SPP_Oktober',
+        'Status_SPP_November', 'Status_SPP_Desember', 'Status_SPP_Januari', 'Status_SPP_Februari',
+        'Status_SPP_Maret', 'Status_SPP_April', 'Status_SPP_Mei', 'Status_SPP_Juni',
+        'Porseni',
+        'Membatik', 
+        'Polisi_Cinta_Anak',
+        'Transportasi_Umum',
+        'Raport',
+        'Buku LKS',
+        'Foto Wisuda',
+        'Akhir Tahun',
+        'P5 1'
+    ];
 
     async function fetchPaymentData() {
-        if (loadingMessage) loadingMessage.style.display = 'block';
-        if (noResultsMessage) noResultsMessage.style.display = 'none';
-        
         try {
             const response = await fetch(googleSheetUrl);
-            if (!response.ok) {
-                throw new Error(`Gagal mengambil data: ${response.status} ${response.statusText}`);
-            }
             const csvText = await response.text();
             
+            console.log("Raw CSV Text:", csvText.substring(0, 500)); 
             allPaymentData = parseCSV(csvText); 
-            
-            if (allPaymentData.length > 0) {
-                const allHeaders = Object.keys(allPaymentData[0]).map(h => h.trim());
-                paymentColumns = allHeaders.filter(header => 
-                    !nonPaymentColumns.includes(header) && header.startsWith('Status_')
-                );
-                
-                if (loadingMessage) loadingMessage.style.display = 'none';
-            } else {
-                if (loadingMessage) loadingMessage.style.display = 'none';
-                if (noResultsMessage) {
-                    noResultsMessage.textContent = 'Data siswa kosong.';
-                    noResultsMessage.classList.remove('info');
-                    noResultsMessage.classList.add('error');
-                    noResultsMessage.style.display = 'block';
-                }
-            }
+            console.log("Parsed Data:", allPaymentData); 
+
         } catch (error) {
             console.error('Error fetching data:', error);
-            if (loadingMessage) loadingMessage.style.display = 'none';
-            if (noResultsMessage) {
-                noResultsMessage.textContent = `Gagal memuat data pembayaran: ${error.message}. Cek URL Google Sheet dan koneksi internet Anda.`;
-                noResultsMessage.classList.remove('info');
-                noResultsMessage.classList.add('error'); 
-                noResultsMessage.style.display = 'block';
-            }
+            noResultsMessage.textContent = 'Gagal memuat data pembayaran. Silakan coba lagi nanti. Cek koneksi internet atau URL Google Sheet.';
+            noResultsMessage.classList.add('error'); 
+            noResultsMessage.style.display = 'block';
         }
     }
 
     function parseCSV(csvText) {
         const lines = csvText.split('\n').filter(line => line.trim() !== '');
-        if (lines.length <= 1) return [];
+        if (lines.length === 0) return [];
 
         const headers = lines[0].split(',').map(header => header.replace(/^"|"$/g, '').trim());
+        console.log("Parsed Headers:", headers); 
+
         const data = [];
 
         for (let i = 1; i < lines.length; i++) {
-            const row = {};
-            const values = lines[i].match(/(?:"[^"]*"|[^,])+/g);
-            
-            if (!values || values.length !== headers.length) {
-                console.warn(`Skipping malformed row: Line ${i + 1}`);
-                continue;
+            const values = [];
+            let inQuote = false;
+            let currentVal = '';
+            for (let j = 0; j < lines[i].length; j++) {
+                const char = lines[i][j];
+                if (char === '"') {
+                    inQuote = !inQuote;
+                } else if (char === ',' && !inQuote) {
+                    values.push(currentVal.trim());
+                    currentVal = '';
+                } else {
+                    currentVal += char;
+                }
             }
+            values.push(currentVal.trim());
 
+            if (values.length !== headers.length) {
+                console.warn(`Skipping malformed row (header/value count mismatch): Line ${i + 1} - "${lines[i]}"`);
+                console.warn(`Expected ${headers.length} values, got ${values.length}. Values:`, values);
+                continue; 
+            }
+            const row = {};
             headers.forEach((header, index) => {
-                const value = values[index].replace(/^"|"$/g, '').trim();
-                row[header] = value;
+                row[header] = values[index];
             });
             data.push(row);
         }
@@ -140,9 +139,16 @@ document.addEventListener('DOMContentLoaded', function() {
             maximumFractionDigits: 0
         }).format(numericAmount);
     }
+
+    function getCalendarMonthIndex(monthName) {
+        const monthMap = {
+            'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
+            'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
+        };
+        return monthMap[monthName];
+    }
     
     function displayManualPayments() {
-        if (!manualPaymentList) return;
         manualPaymentList.innerHTML = '';
         manualArrears.forEach((item, index) => {
             const li = document.createElement('li');
@@ -167,35 +173,38 @@ document.addEventListener('DOMContentLoaded', function() {
         manualArrears = []; 
 
         if (!studentData) { 
-            if (studentDetailsContainer) studentDetailsContainer.style.display = 'none';
-            if (printSlipButton) printSlipButton.style.display = 'none'; 
-            if (printArrearsButton) printArrearsButton.style.display = 'none'; 
-            if (noResultsMessage) {
-                noResultsMessage.textContent = 'Data siswa tidak ditemukan.'; 
-                noResultsMessage.classList.add('error'); 
-                noResultsMessage.style.display = 'block';
-            }
+            studentDetailsContainer.style.display = 'none';
+            printSlipButton.style.display = 'none'; 
+            printArrearsButton.style.display = 'none'; 
+            noResultsMessage.textContent = 'Data siswa tidak ditemukan.'; 
+            noResultsMessage.classList.add('error'); 
+            noResultsMessage.style.display = 'block';
             return;
         }
 
-        if (studentDetailsContainer) studentDetailsContainer.style.display = 'block'; 
-        if (printSlipButton) printSlipButton.style.display = 'inline-flex'; 
-        if (printArrearsButton) printArrearsButton.style.display = 'inline-flex'; 
-        if (noResultsMessage) noResultsMessage.style.display = 'none'; 
+        studentDetailsContainer.style.display = 'block'; 
+        printSlipButton.style.display = 'inline-flex'; 
+        printArrearsButton.style.display = 'inline-flex'; 
+        noResultsMessage.style.display = 'none'; 
         
         displayManualPayments();
 
-        if (studentNameSpan) studentNameSpan.textContent = studentData['Nama Siswa'] || '-';
-        if (studentNISNSpan) studentNISNSpan.textContent = studentData['NISN'] || '-';
-        if (studentClassSpan) studentClassSpan.textContent = studentData['Kelas'] || '-';
-        if (parentNameDetailSpan) parentNameDetailSpan.textContent = studentData['Nama Orang Tua'] || '-';
+        studentNameSpan.textContent = studentData['Nama Siswa'] || '-';
+        studentNISNSpan.textContent = studentData['NISN'] || '-';
+        studentClassSpan.textContent = studentData['Kelas'] || '-';
+        parentNameDetailSpan.textContent = studentData['Nama Orang Tua'] || '-';
 
-        if (paymentCardsContainer) paymentCardsContainer.innerHTML = ''; 
+        paymentCardsContainer.innerHTML = ''; 
 
         paymentColumns.forEach(colName => {
             const status = studentData[colName];
-            if (status !== undefined && status !== null && status.trim() !== '' && paymentCardsContainer) {
-                let displayColName = colName.replace(/^Status_/, '').replace(/_/g, ' ');
+            if (status !== undefined && status !== null && status.trim() !== '') {
+                let displayColName = colName;
+                if (colName.startsWith('Status_SPP_')) {
+                    displayColName = colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' '); 
+                } else if (colName.includes('_')) {
+                    displayColName = colName.replace(/_/g, ' '); 
+                }
                 
                 const paymentItemDiv = document.createElement('div');
                 paymentItemDiv.classList.add('payment-item-card');
@@ -206,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="nominal-input-container">
                         <label for="nominal-${colName}">Nominal:</label>
-                        <input type="number" id="nominal-${colName}" class="nominal-input" placeholder="0" min="0" value="${colName.startsWith('Status_SPP_') && status.toLowerCase().trim() !== 'lunas' ? SPP_NOMINAL_AMOUNT : ''}">
+                        <input type="number" id="nominal-${colName}" class="nominal-input" placeholder="0" min="0" value="${colName.startsWith('Status_SPP_') ? SPP_NOMINAL_AMOUNT : ''}">
                     </div>
                     <input type="checkbox" class="payment-checkbox" data-col-name="${colName}">
                 `;
@@ -216,21 +225,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function performSearch() {
-        const studentSearchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-        const parentSearchTerm = parentNameInput ? parentNameInput.value.toLowerCase().trim() : '';
+        const studentSearchTerm = searchInput.value.toLowerCase().trim();
+        const parentSearchTerm = parentNameInput.value.toLowerCase().trim();
         
-        if (studentDetailsContainer) studentDetailsContainer.style.display = 'none'; 
-        if (noResultsMessage) noResultsMessage.style.display = 'none'; 
-        if (printSlipButton) printSlipButton.style.display = 'none'; 
-        if (printArrearsButton) printArrearsButton.style.display = 'none'; 
+        studentDetailsContainer.style.display = 'none'; 
+        noResultsMessage.style.display = 'none'; 
+        printSlipButton.style.display = 'none'; 
+        printArrearsButton.style.display = 'none'; 
 
         if (studentSearchTerm === '' || parentSearchTerm === '') {
-            if (noResultsMessage) {
-                noResultsMessage.textContent = 'Mohon isi Nama Siswa/NISN dan Nama Orang Tua.';
-                noResultsMessage.classList.remove('error'); 
-                noResultsMessage.classList.add('info'); 
-                noResultsMessage.style.display = 'block';
-            }
+            noResultsMessage.textContent = 'Mohon isi Nama Siswa/NISN dan Nama Orang Tua.';
+            noResultsMessage.classList.add('info'); 
+            noResultsMessage.style.display = 'block';
             displayStudentDetails(null); 
             return;
         }
@@ -249,12 +255,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (foundStudent) {
             displayStudentDetails(foundStudent); 
         } else {
-            if (noResultsMessage) {
-                noResultsMessage.textContent = 'Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.';
-                noResultsMessage.classList.remove('info');
-                noResultsMessage.classList.add('error'); 
-                noResultsMessage.style.display = 'block'; 
-            }
+            noResultsMessage.textContent = 'Data siswa tidak ditemukan atau kombinasi nama tidak cocok. Mohon periksa kembali.';
+            noResultsMessage.classList.add('error'); 
+            noResultsMessage.style.display = 'block'; 
             displayStudentDetails(null); 
         }
     }
@@ -273,7 +276,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalNominal = 0; 
 
         selectedPayments.forEach(payment => {
-            let displayColName = payment.colName.replace(/^Status_/, '').replace(/_/g, ' ');
+            let displayColName = payment.colName;
+            if (payment.colName.startsWith('Status_SPP_')) {
+                displayColName = payment.colName.replace('Status_SPP_', 'SPP ').replace(/_/g, ' '); 
+            } else if (payment.colName.includes('_')) {
+                displayColName = payment.colName.replace(/_/g, ' '); 
+            }
             
             paymentItemsHtml += `
                 <tr>
@@ -403,13 +411,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonthCalendarIndex = currentDate.getMonth(); 
+        const currentDay = currentDate.getDate();
 
         let arrearsItems = [];
         let totalArrearsNominal = 0;
 
+        const ACADEMIC_YEAR_START_MONTH_CAL_INDEX = getCalendarMonthIndex('Juli'); 
+        
         paymentColumns.forEach(colName => {
             const status = studentData[colName];
 
+            // Cek apakah statusnya BELUM LUNAS atau TERTUNDA
             if (status && (status.toLowerCase().trim() === 'belum lunas' || status.toLowerCase().trim() === 'tertunda')) {
                 
                 const nominalInput = document.getElementById(`nominal-${colName}`);
@@ -420,13 +434,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     nominalValue = SPP_NOMINAL_AMOUNT;
                 }
                 
-                let displayColName = colName.replace(/^Status_/, '').replace(/_/g, ' ');
-                
-                arrearsItems.push({
-                    name: displayColName,
-                    nominal: nominalValue
-                });
-                totalArrearsNominal += nominalValue;
+                let displayColName = colName;
+                if (colName.startsWith('Status_SPP_')) {
+                    const monthName = colName.replace('Status_SPP_', '');
+                    displayColName = `SPP ${monthName}`;
+                    arrearsItems.push({
+                        name: displayColName,
+                        nominal: nominalValue
+                    });
+                    totalArrearsNominal += nominalValue;
+                } else {
+                    displayColName = colName.replace(/_/g, ' '); 
+                    arrearsItems.push({
+                        name: displayColName,
+                        nominal: nominalValue
+                    });
+                    totalArrearsNominal += nominalValue;
+                }
             }
         });
         
@@ -564,111 +588,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // === Event Listeners ===
-    if (searchButton) {
-        searchButton.addEventListener('click', performSearch);
-    }
+    searchButton.addEventListener('click', performSearch);
     
-    if (printSlipButton) {
-        printSlipButton.addEventListener('click', function() {
-            if (!currentStudentData) {
-                alert('Tidak ada data siswa yang ditemukan. Mohon lakukan pencarian terlebih dahulu.');
-                return;
+    printSlipButton.addEventListener('click', function() {
+        if (!currentStudentData) {
+            alert('Tidak ada data siswa yang ditemukan. Mohon lakukan pencarian terlebih dahulu.');
+            return;
+        }
+
+        const selectedPayments = [];
+        const checkboxes = document.querySelectorAll('.payment-checkbox:checked'); 
+
+        if (checkboxes.length === 0) {
+            alert('Pilih setidaknya satu pembayaran yang ingin dicetak!');
+            return;
+        }
+
+        checkboxes.forEach(checkbox => {
+            const colName = checkbox.dataset.colName; 
+            const paymentItemDiv = checkbox.closest('.payment-item-card');
+            const statusSpan = paymentItemDiv.querySelector('.payment-status');
+            const nominalInput = paymentItemDiv.querySelector('.nominal-input');
+            
+            const nominalValue = nominalInput ? parseInt(nominalInput.value) : 0;
+
+            if (colName && statusSpan) {
+                selectedPayments.push({
+                    colName: colName,
+                    status: statusSpan.textContent, 
+                    nominal: nominalValue 
+                });
             }
-
-            const selectedPayments = [];
-            const checkboxes = document.querySelectorAll('.payment-checkbox:checked'); 
-
-            if (checkboxes.length === 0) {
-                alert('Pilih setidaknya satu pembayaran yang ingin dicetak!');
-                return;
-            }
-
-            checkboxes.forEach(checkbox => {
-                const colName = checkbox.dataset.colName; 
-                const paymentItemDiv = checkbox.closest('.payment-item-card');
-                const statusSpan = paymentItemDiv ? paymentItemDiv.querySelector('.payment-status') : null;
-                const nominalInput = paymentItemDiv ? paymentItemDiv.querySelector('.nominal-input') : null;
-                
-                const nominalValue = nominalInput ? parseInt(nominalInput.value) : 0;
-
-                if (colName && statusSpan) {
-                    selectedPayments.push({
-                        colName: colName,
-                        status: statusSpan.textContent, 
-                        nominal: nominalValue 
-                    });
-                }
-            });
-
-            generatePrintSlip(currentStudentData, selectedPayments); 
         });
-    }
 
-    if (printArrearsButton) {
-        printArrearsButton.addEventListener('click', function() {
-            if (!currentStudentData) {
-                alert('Tidak ada data siswa yang ditemukan. Mohon lakukan pencarian terlebih dahulu.');
-                return;
-            }
-            generateCombinedArrearsSlip(currentStudentData);
-        });
-    }
+        generatePrintSlip(currentStudentData, selectedPayments); 
+    });
+
+    printArrearsButton.addEventListener('click', function() {
+        if (!currentStudentData) {
+            alert('Tidak ada data siswa yang ditemukan. Mohon lakukan pencarian terlebih dahulu.');
+            return;
+        }
+        generateCombinedArrearsSlip(currentStudentData);
+    });
     
-    if (addManualPaymentBtn) {
-        addManualPaymentBtn.addEventListener('click', function() {
-            const name = manualPaymentNameInput ? manualPaymentNameInput.value.trim() : '';
-            const nominal = manualPaymentNominalInput ? parseInt(manualPaymentNominalInput.value) : NaN;
+    addManualPaymentBtn.addEventListener('click', function() {
+        const name = manualPaymentNameInput.value.trim();
+        const nominal = parseInt(manualPaymentNominalInput.value);
 
-            if (name === '' || isNaN(nominal) || nominal <= 0) {
-                alert('Mohon isi nama pembayaran dan nominal yang valid (angka positif).');
-                return;
-            }
+        if (name === '' || isNaN(nominal) || nominal <= 0) {
+            alert('Mohon isi nama pembayaran dan nominal yang valid (angka positif).');
+            return;
+        }
 
-            manualArrears.push({
-                name: name,
-                nominal: nominal
-            });
-
-            if (manualPaymentNameInput) manualPaymentNameInput.value = '';
-            if (manualPaymentNominalInput) manualPaymentNominalInput.value = '';
-            displayManualPayments();
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                performSearch();
-            }
-        });
-    }
-
-    if (parentNameInput) {
-        parentNameInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                performSearch();
-            }
-        });
-    }
-
-    // Fungsi tambahan untuk scroll
-    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-    if (scrollToTopBtn) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 200) {
-                scrollToTopBtn.style.display = 'block';
-            } else {
-                scrollToTopBtn.style.display = 'none';
-            }
+        manualArrears.push({
+            name: name,
+            nominal: nominal
         });
 
-        scrollToTopBtn.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
+        manualPaymentNameInput.value = '';
+        manualPaymentNominalInput.value = '';
+        displayManualPayments();
+    });
+
+    searchInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            performSearch();
+        }
+    });
+    parentNameInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            performSearch();
+        }
+    });
 
     fetchPaymentData();
 });
