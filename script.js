@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // === Konfigurasi Utama ===
     // GANTI URL INI DENGAN URL CSV GOOGLE SHEET ANDA
-    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKdDHklYeVMGqh/pub?output=csv'; 
+    const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQGPus51iCYkSnZKnqv_WqqcVMgye4d9ULtF_vNYRJy3rnVKvwoh4qUEU-eHhXNiXIKtDHklYeVMGqh/pub?output=csv'; 
     const schoolLogoPath = 'img/ARRUHANIYAH 3.png'; 
     const schoolName = "TK Islam Arruhaniyah";
     const schoolAddress = "Kp. Tanah Tinggi Gg. H. Samat No. 30 Kel. Setia Asih Kec. Tarumajaya Kab. Bekasi 17215 Jawa Barat Indonesia";
@@ -677,3 +677,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetchPaymentData();
 });
+
